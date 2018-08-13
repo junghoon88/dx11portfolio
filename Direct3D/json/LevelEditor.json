@@ -1,0 +1,39 @@
+{
+   "Environment" : {
+      "Direction" : [
+         -0.39600002765655518,
+         -1.0,
+         -0.0090000005438923836,
+         0.0,
+         0.0,
+         0.0,
+         0.0
+      ],
+      "Sky" : {
+         "Horizon Height" : 0.030000001192092896
+      }
+   },
+   "Global Light" : {
+      "Direction" : [ 0.023000001907348633, -0.74100005626678467, 1.0, 0.0, 0.0, 0.0, 0.0 ],
+      "Overcast" : 0.81800001859664917
+   },
+   "LevelFile" : {
+      "FileName" : [ "LevelTest.json" ]
+   },
+   "Models Info" : {
+      "Model 00" : {
+         "FileName" : [ "Grund" ],
+         "FilePath" : [ "../../_Contents/Models/Grund/" ],
+         "TRANSFORM-Position" : [ -13.692571640014648, 0.0, 19.783317565917969 ],
+         "TRANSFORM-RotationDeg" : [ 0.0, 93.003425598144531, 0.0 ],
+         "TRANSFORM-Scale" : [ 1.0, 1.0, 1.0 ]
+      },
+      "Model 01" : {
+         "FileName" : [ "Grund" ],
+         "FilePath" : [ "../../_Contents/Models/Grund/" ],
+         "TRANSFORM-Position" : [ 0.0, 0.0, 20.0 ],
+         "TRANSFORM-RotationDeg" : [ 0.0, 70.0, 0.0 ],
+         "TRANSFORM-Scale" : [ 2.0, 2.0, 2.0 ]
+      }
+   }
+}

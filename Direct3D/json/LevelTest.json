@@ -1,0 +1,68 @@
+{
+   "Environment" : {
+      "Sky" : {
+         "Ceiling Color Day" : [ 0.13432334363460541, 0.16748017072677612, 0.42156863212585449, 1.0 ],
+         "Ceiling Color Night" : [ 0.36634945869445801, 0.36637222766876221, 0.7549019455909729, 1.0 ],
+         "Ceiling Color Twilight" : [ 0.17978663742542267, 0.25965461134910583, 0.63235294818878174, 1.0 ],
+         "Horizon Color Day" : [ 0.48529410362243652, 0.36159166693687439, 0.36159166693687439, 1.0 ],
+         "Horizon Color Night" : [ 0.15686273574829102, 0.059207998216152191, 0.059207998216152191, 1.0 ],
+         "Horizon Color Twilight" : [ 0.70588231086730957, 0.34463629126548767, 0.10380623489618301, 1.5 ],
+         "Horizon Height" : 0.20200000703334808
+      },
+      "SkyPlane" : {
+         "brightness" : 0.52000004053115845,
+         "scale" : 0.64000004529953003,
+         "skyPlaneBottom" : 0.0,
+         "skyPlaneResolution" : 15,
+         "skyPlaneTop" : 0.72000002861022949,
+         "skyPlaneWidth" : 7.4000005722045898,
+         "textureRepeat" : 3
+      }
+   },
+   "Landscape" : {
+      "Terrain" : {
+         "Alpha Map 0" : [ "../../_Contents/Textures/AlphaMap2.png" ],
+         "Alpha Map 1" : [ "../../_Contents/Textures/AlphaMap1.png" ],
+         "Brush Color Hover" : [ 1.0, 0.0, 0.0, 1.0 ],
+         "Brush Color Selected" : [ 0.0, 0.0, 1.0, 1.0 ],
+         "Detail Map" : [ "../../_Contents/Landscape/Dirt3_detail.png" ],
+         "Diffuse Map" : [ "../../_Contents/Landscape/Dirt.png" ],
+         "Grid Color" : [ 1.0, 1.0, 1.0, 1.0 ],
+         "Grid Spacing" : 1,
+         "Grid Thickness" : 0.029999999329447746,
+         "Height Map" : [ "../../_Contents/Landscape/HeightMap256.png" ],
+         "Shader File" : [ "./Shaders/Terrain.hlsl" ],
+         "Textures0" : [ "../../_Contents/Landscape/terrain/adesert_mntn4_d.jpg" ],
+         "Textures1" : [ "../../_Contents/Landscape/terrain/grass_mix_d.jpg" ],
+         "Textures2" : [ "../../_Contents/Landscape/terrain/ground_crackedo_d.jpg" ],
+         "Textures3" : [ "../../_Contents/Landscape/terrain/grass_green_d.jpg" ],
+         "Textures4" : [ "../../_Contents/Landscape/terrain/grass_mix_d.jpg" ],
+         "Textures5" : [ "../../_Contents/Landscape/terrain/ground_crackedo_d.jpg" ]
+      }
+   },
+   "Lights" : {
+      "Point Light" : {
+         "Color0" : [ 0.78921568393707275, 0.2398596853017807, 0.2398596853017807 ],
+         "Color1" : [ 0.27804210782051086, 0.62970727682113647, 0.65196079015731812 ],
+         "Intensity0" : 1.5000001192092896,
+         "Intensity1" : 2.0,
+         "Light Count" : 2,
+         "Name0" : [ "PL-00" ],
+         "Name1" : [ "PL-01" ],
+         "Position0" : [ 68.600006103515625, 2.8000001907348633, 18.30000114440918 ],
+         "Position1" : [ 200.0, 3.0, 50.0 ],
+         "Range0" : 20.0,
+         "Range1" : 13.600000381469727
+      },
+      "Spot Light" : {
+         "Color0" : [ 0.4460090696811676, 0.43665897846221924, 0.7549019455909729 ],
+         "Direction0" : [ 0.30000001192092896, -0.80000001192092896, 0.30000001192092896 ],
+         "InnerAngle0" : 0.70000004768371582,
+         "Light Count" : 1,
+         "Name0" : [ "SL-00" ],
+         "OuterAngle0" : 0.33000001311302185,
+         "Position0" : [ 109.00000762939453, 13.000000953674316, 54.000003814697266 ],
+         "Range0" : 0.0
+      }
+   }
+}

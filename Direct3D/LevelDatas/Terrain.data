@@ -1,0 +1,7 @@
+<Material>
+    <Shader>./Shaders/Terrain.hlsl</Shader>
+    <DiffuseMap>../../_Contents/Landscape/Dirt.png</DiffuseMap>
+    <DetailMap>../../_Contents/Landscape/Dirt3_detail.png</DetailMap>
+</Material>
+
+<HeightMap>../../_Contents/Landscape/HeightMap256.png</HeightMap>
