@@ -4,7 +4,6 @@
 #include "../Landscape/Terrain.h"
 
 class EnemyTank;
-class ModelShape;
 
 class PlayerBullet;
 
@@ -16,7 +15,7 @@ public:
 	GameSettings(ExecuteValues* values);
 	~GameSettings();
 
-	void Update(ModelShape* modelShape);
+	void Update(void);
 	void Render(void);
 	void PostRender(void);
 

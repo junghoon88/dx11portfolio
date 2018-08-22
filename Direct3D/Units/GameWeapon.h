@@ -13,7 +13,7 @@ public:
 	GameWeapon();
 	~GameWeapon();
 
-	virtual void Update(ModelShape* modelShape) override {}
+	virtual void Update(void) override {}
 	virtual void Render(void) override {}
 	virtual void PostRender(void) override {}
 

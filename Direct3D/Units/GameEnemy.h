@@ -19,7 +19,7 @@ public:
 	GameEnemy(wstring path);
 	virtual ~GameEnemy();
 
-	virtual void Update(ModelShape* modelShape);
+	virtual void Update(void);
 	virtual void Render(void);
 
 	virtual void ActionIdle(void) {}

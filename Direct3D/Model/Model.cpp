@@ -93,9 +93,10 @@ void Model::CopyAbsoluteBoneTo(vector<D3DXMATRIX>& transforms)
 void Model::CopyAbsoluteBoneTo(D3DXMATRIX matrix, vector<D3DXMATRIX>& transforms)
 {
 	transforms.clear();
-	transforms.assign(bones.size(), D3DXMATRIX());
+	UINT boneSize = bones.size();
+	transforms.assign(boneSize, D3DXMATRIX());
 
-	for (UINT i = 0; i < bones.size(); i++)
+	for (UINT i = 0; i < boneSize; i++)
 	{
 		ModelBone* bone = bones[i];
 
@@ -106,10 +107,22 @@ void Model::CopyAbsoluteBoneTo(D3DXMATRIX matrix, vector<D3DXMATRIX>& transforms
 		}
 		else
 		{
-			int index = bone->parent->index;
-			transforms[i] = bone->transform * transforms[index];
+			transforms[i] = bone->transform * transforms[bone->parent->index];
 		}
 	}
+}
+
+D3DXMATRIX Model::GetAbsoluteBoneTo(UINT index)
+{
+	assert(index < bones.size());
+
+	D3DXMATRIX mat = bones[index]->GetTransform();
+	if (bones[index]->GetParent())
+	{
+		return mat * GetAbsoluteBoneTo(bones[index]->GetParentIndex());
+	}
+
+	return mat;
 }
 
 void Model::ScanPointMinMax(D3DXVECTOR3 * min, D3DXVECTOR3 * max)
@@ -122,6 +135,9 @@ void Model::ScanPointMinMax(D3DXVECTOR3 * min, D3DXVECTOR3 * max)
 
 void Model::ShowTreeNode(ModelBone* bone)
 {
+	if (bone == NULL)
+		bone = root;
+
 	string boneName = String::ToString(bone->GetName());
 	char num[10];
 	itoa(bone->GetIndex(), num, 10);

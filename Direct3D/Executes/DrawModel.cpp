@@ -4,30 +4,22 @@
 #include "../Fbx/Exporter.h"
 
 #include "../Units/GameSettings.h"
-#include "../Model/Bounding/ModelShape.h"
 
 DrawModel::DrawModel(ExecuteValues* values)
 	: Execute(values)
 {
 	settings = new GameSettings(values);
-	modelShape = new ModelShape();
 
 }
 
 DrawModel::~DrawModel()
 {
-
-	SAFE_DELETE(modelShape);
 	SAFE_DELETE(settings);
 }
 
 void DrawModel::Update(void)
 {
-	modelShape->ClearBuffer();
-
-	settings->Update(modelShape);
-
-	modelShape->CreateBuffer();
+	settings->Update();
 }
 
 void DrawModel::PreRender(void)
@@ -37,7 +29,6 @@ void DrawModel::PreRender(void)
 void DrawModel::Render(void)
 {
 	settings->Render();
-	modelShape->Render();
 }
 
 void DrawModel::PostRender(void)

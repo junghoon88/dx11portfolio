@@ -1,7 +1,6 @@
 #pragma once
 
 class GameSettings;
-class ModelShape;
 
 class DrawModel : public Execute
 {
@@ -26,6 +25,5 @@ private:
 
 private:
 	GameSettings* settings;
-	ModelShape* modelShape;
 
 };

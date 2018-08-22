@@ -124,9 +124,6 @@
     <ClCompile Include="Objects\GameRender.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\GameAnimationModel.cpp">
-      <Filter>Objects\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\GameModel.cpp">
       <Filter>Objects\Models</Filter>
     </ClCompile>
@@ -209,6 +206,12 @@
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="Landscape\Ocean.cpp">
+      <Filter>Landscape</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewer\FixedCamera.cpp">
+      <Filter>Viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="Landscape\Grid3Axis.cpp">
       <Filter>Landscape</Filter>
     </ClCompile>
   </ItemGroup>
@@ -380,9 +383,6 @@
     <ClInclude Include="Objects\AnimationKeyframe.h">
       <Filter>Objects\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\GameAnimationModel.h">
-      <Filter>Objects\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\GameModel.h">
       <Filter>Objects\Models</Filter>
     </ClInclude>
@@ -474,6 +474,12 @@
       <Filter>Lights</Filter>
     </ClInclude>
     <ClInclude Include="Landscape\Ocean.h">
+      <Filter>Landscape</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewer\FixedCamera.h">
+      <Filter>Viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="Landscape\Grid3Axis.h">
       <Filter>Landscape</Filter>
     </ClInclude>
   </ItemGroup>

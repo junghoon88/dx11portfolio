@@ -26,12 +26,12 @@ GameSettings::~GameSettings()
 	SAFE_DELETE(player);
 }
 
-void GameSettings::Update(ModelShape* modelShape)
+void GameSettings::Update(void)
 {
 	if (terrain) terrain->Update();
 
-	if (tank)	tank->Update(modelShape);
-	if (player) player->Update(modelShape);
+	if (tank)	tank->Update();
+	if (player) player->Update();
 }
 
 void GameSettings::Render()

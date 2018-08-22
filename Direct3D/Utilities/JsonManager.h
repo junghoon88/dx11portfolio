@@ -23,6 +23,9 @@ namespace Json
 	void GetValue(Json::Value& parent, string name, D3DXCOLOR& value);
 	void SetValue(Json::Value& parent, string name, D3DXCOLOR& value);
 
+	void GetValue(Json::Value& parent, string name, D3DXMATRIX& value);
+	void SetValue(Json::Value& parent, string name, D3DXMATRIX& value);
+
 	void GetValue(Json::Value& parent, string name, string& value);
 	void SetValue(Json::Value& parent, string name, string& value);
 

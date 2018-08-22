@@ -133,7 +133,7 @@ float4 GetWorld(float4 position)
     return position;
 }
 
-float4 GetWorld(float4 position, float4x4 world)
+float4 GetWorld(float4 position, matrix world)
 {
     position = mul(position, world);
     return position;
@@ -168,6 +168,14 @@ float4 GetWV(float4 position, float4x4 world)
 float4 GetWVP(float4 position)
 {
     position = GetWorld(position);
+    position = GetView(position);
+    position = GetProjection(position);
+    return position;
+}
+
+float4 GetWVP(float4 position, matrix world)
+{
+    position = GetWorld(position, world);
     position = GetView(position);
     position = GetProjection(position);
     return position;

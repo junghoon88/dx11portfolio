@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BoundingCapsule.h"
 #include "BoundingSphere.h"
+#include "../../Units/GameUnit.h"
 
 #define SMALL_NUM (float)1e-6
 
@@ -36,14 +37,27 @@ void BoundingCapsule::Update(void)
 	D3DXMatrixTranslation(&T, transform.Position.x, transform.Position.y, transform.Position.z);
 	W = S * R * T;
 
-	//myWorld = W * socketTransform * mymodel->GetMyWorld();
+	D3DXMatrixIdentity(&socketTransform);
+	if (socketnum > -1)
+	{
+		//socketTransform = mymodel->GetModel()->GetBone(socketnum)->GetTransform();
+		socketTransform = mymodel->GetModel()->GetAbsoluteBoneTo(socketnum);
+		//W *= socketTransform;
+	}
+
+	D3DXMATRIX modelRoot;
+	mymodel->GetRootAxis(modelRoot);
+	D3DXMATRIX modelWorld;
+	mymodel->GetWorld(modelWorld);
+	//W *= modelWorld;
+
+	myWorld = W * socketTransform * (modelRoot * modelWorld);
 }
 
 void BoundingCapsule::PostRender(void)
 {
-	ImGui::Separator();
 	ImGui::InputInt("socketNum", &socketnum);
-	//socketnum = Math::Clamp(socketnum, -1, mymodel->GetModel()->GetBoneCount() - 1);
+	socketnum = Math::Clamp(socketnum, -1, mymodel->GetModel()->GetBoneCount() - 1);
 
 	if (ImGui::Button("Clac"))
 	{
@@ -162,12 +176,18 @@ void BoundingCapsule::GetCenters(D3DXVECTOR3 & c1, D3DXVECTOR3 & c2)
 
 float BoundingCapsule::GetRadius(void)
 {
-	return radius;// * mymodel->GetTransformRef().Scale.x;
+	D3DXMATRIX mat;
+	mymodel->GetWorld(mat);
+	
+	return radius * mat._11;// * mymodel->GetTransformRef().Scale.x;
 }
 
 float BoundingCapsule::GetHeight(void)
 {
-	return height;// * mymodel->GetTransformRef().Scale.y;
+	D3DXMATRIX mat;
+	mymodel->GetWorld(mat);
+
+	return height * mat._22;// * mymodel->GetTransformRef().Scale.y;
 }
 
 bool BoundingCapsule::isCollision(BoundingCapsule * capsule1, BoundingCapsule * capsule2)

@@ -26,9 +26,9 @@ MeshCube::~MeshCube()
 	SAFE_DELETE(buffer);
 }
 
-void MeshCube::Update(ModelShape * modelShape)
+void MeshCube::Update()
 {
-	GameModel::Update(modelShape);
+	GameModel::Update();
 
 	buffer->SetVSBuffer(4);
 }

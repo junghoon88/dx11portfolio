@@ -6,7 +6,6 @@
 
 #include "../Model/Bounding/BoundingBox.h"
 #include "../Model/Bounding/Ray.h"
-#include "../Model/Bounding/ModelShape.h"
 
 GameEnemy::GameEnemy(wstring path)
 	: GameUnit(path)
@@ -59,10 +58,10 @@ GameEnemy::~GameEnemy()
 	SAFE_DELETE(aiContext);
 }
 
-void GameEnemy::Update(ModelShape* modelShape)
+void GameEnemy::Update(void)
 {
 	aiContext->Update();
-	GameUnit::Update(modelShape);
+	GameUnit::Update();
 }
 
 void GameEnemy::Render(void)

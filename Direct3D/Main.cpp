@@ -21,7 +21,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR param, int 
 		String::Replace(&dir, "\\", "/");
 		//상위 폴더 2번
 		dir = Path::GetParentDirectory(dir); 
-		dir = Path::GetParentDirectory(dir);
+		//dir = Path::GetParentDirectory(dir);
 		gStringParentDirectory = dir;
 		gWstringParentDirectory = String::ToWString(gStringParentDirectory);
 	}

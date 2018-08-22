@@ -8,12 +8,14 @@ struct AnimationClip
 	vector<AnimationKeyframe*> Keyframes;
 
 	wstring fileName;
+	bool bLoop;
 
 	//inline wstring GetFileName(void) { return fileName; }
 
-	void ReadData(wstring file)
+	void ReadData(wstring file, bool bLoop = false)
 	{
 		fileName = file;
+		this->bLoop = bLoop;
 
 		//TODO : *.anim 파일 저장 형식 통일해야함
 		BinaryReader* r = new BinaryReader();

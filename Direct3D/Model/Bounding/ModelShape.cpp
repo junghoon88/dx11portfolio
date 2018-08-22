@@ -10,6 +10,8 @@
 
 #include "../../Utilities/Math.h"
 
+ModelShape* ModelShape::instance = NULL;
+
 
 ModelShape::ModelShape()
 	: vertexBuffer(NULL), indexBuffer(NULL)

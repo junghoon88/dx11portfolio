@@ -4,7 +4,7 @@
 #include "GameData.h"
 
 GameUnit::GameUnit(wstring path)
-	: GameAnimationModel(path)
+	: GameModel(path)
 	, curWeapon(NULL)
 	, curWeaponSlot(-1)
 {
@@ -23,14 +23,14 @@ GameUnit::~GameUnit()
 {
 }
 
-void GameUnit::Update(ModelShape* modelShape)
+void GameUnit::Update(void)
 {
-	GameAnimationModel::Update(modelShape);
+	GameModel::Update();
 }
 
 void GameUnit::Render(void)
 {
-	GameAnimationModel::Render();
+	GameModel::Render();
 }
 
 void GameUnit::Attack(GameUnit * target)

@@ -21,9 +21,7 @@ PixelInput VS_Bone(VertexTextureNormal input)
 {
     PixelInput output;
     
-    output.position = mul(input.position, Bones[BoneNumber]);
-    output.position = mul(output.position, _view);
-    output.position = mul(output.position, _projection);
+    output.position = GetWVP(input.position, Bones[BoneNumber]);
 
     output.uv = input.uv;
 
@@ -32,7 +30,7 @@ PixelInput VS_Bone(VertexTextureNormal input)
     return output;
 }
 
-PixelInput VS(VertexTextureNormalBlend input)
+PixelInput VS(VertexTextureNormalTangentBlend input)
 {
     PixelInput output;
 
@@ -43,9 +41,7 @@ PixelInput VS(VertexTextureNormalBlend input)
     transform += mul(input.blendWeights.w, Bones[(uint) input.blendIndices.w]);
 
     
-    output.position = mul(input.position, transform);
-    output.position = mul(output.position, _view);
-    output.position = mul(output.position, _projection);
+    output.position = GetWVP(input.position, transform);
 
     output.normal = mul(input.normal, (float3x3) transform);
 

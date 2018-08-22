@@ -2,6 +2,7 @@
 #include "Program.h"
 
 #include "./Viewer/Free.h"
+#include "./Viewer/FixedCamera.h"
 
 
 #include "./Executes/DrawModel.h"
@@ -23,7 +24,6 @@ Program::~Program()
 {
 	for (Execute* exe : executes)
 		SAFE_DELETE(exe);
-
 
 	Json::WriteData(L"json/LevelEditor.json", values->jsonRoot);
 
@@ -57,8 +57,12 @@ void Program::Update(void)
 
 	gLight->Update();
 
+	gModelShape->ClearBuffer();
+
 	for (Execute* exe : executes)
 		exe->Update();
+
+	gModelShape->CreateBuffer();
 }
 
 void Program::PreRender(void)
@@ -73,6 +77,8 @@ void Program::Render(void)
 
 	for (Execute* exe : executes)
 		exe->Render();
+
+	gModelShape->Render();
 }
 
 void Program::PostRender(void)
@@ -105,9 +111,13 @@ void Program::InitializeValues(void)
 	values->GlobalLight = new LightBuffer();
 	values->GlobalTime = new TimeBuffer();
 
-	values->MainCamera = new Free(50);
-	values->MainCamera->SetPosition(122, 209, -118);
-	values->MainCamera->SetRotationDegree(48, 0);
+	//values->MainCamera = new Free(50);
+	//values->MainCamera->SetPosition(122, 209, -118);
+	//values->MainCamera->SetRotationDegree(48, 0);
+
+	values->MainCamera = new FixedCamera();
+	values->MainCamera->SetPosition(0, 0, 10);
+	values->MainCamera->SetRotationDegree(0, 0);
 
 	values->jsonRoot = new Json::Value();
 	Json::ReadData(L"json/LevelEditor.json", values->jsonRoot);
@@ -119,8 +129,8 @@ void Program::InitializeValues(void)
 
 void Program::InitializeExecutes(void)
 {
-	//executes.push_back(new EditModel(values));
-	executes.push_back(new EditLevel(values));
+	executes.push_back(new EditModel(values));
+	//executes.push_back(new EditLevel(values));
 	executes.push_back(new ExeGui(values));
 }
 

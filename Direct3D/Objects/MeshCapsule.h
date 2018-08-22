@@ -7,7 +7,7 @@ public:
 	MeshCapsule();
 	~MeshCapsule();
 
-	void Update(ModelShape* modelShape) override;
+	void Update(void) override;
 	void Render(void) override;
 	void PostRender(void) override;
 

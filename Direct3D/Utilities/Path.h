@@ -39,10 +39,10 @@ public:
 	const static WCHAR* ShaderFilter;
 	const static WCHAR* MaterialMeshFilter;
 	const static WCHAR* AnimFilter;
+	const static WCHAR* GameModelFilter;
 
 	static void OpenFileDialog(wstring file, const WCHAR* filter, wstring folder, function<void(wstring)> func, HWND hwnd = NULL);
 	static void SaveFileDialog(wstring file, const WCHAR* filter, wstring folder, function<void(wstring)> func, HWND hwnd = NULL);
-	static void OpenPathDialog(wstring folder, function<void(wstring)> func, HWND hwnd = NULL);
 
 	static void GetFiles(vector<string>* files, string path, string filter, bool bFindSubFolder);
 	static void GetFiles(vector<wstring>* files, wstring path, wstring filter, bool bFindSubFolder);

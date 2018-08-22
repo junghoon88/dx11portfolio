@@ -110,6 +110,8 @@ WPARAM Window::Run(void)
 
 	program = new Program();
 
+	ModelShape::Create();
+
 	while (true)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -154,6 +156,7 @@ WPARAM Window::Run(void)
 	D3D::Delete();
 	CommandManager::Delete();
 	LightManager::Delete();
+	ModelShape::Delete();
 
 	return msg.wParam;
 }

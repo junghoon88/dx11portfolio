@@ -56,10 +56,11 @@ public:
 	//Àý´ë ÁÂÇ¥
 	void CopyAbsoluteBoneTo(vector<D3DXMATRIX>& transforms);
 	void CopyAbsoluteBoneTo(D3DXMATRIX matrix, vector<D3DXMATRIX>& transforms);
+	D3DXMATRIX GetAbsoluteBoneTo(UINT index);
 
 
 	void ScanPointMinMax(D3DXVECTOR3* min, D3DXVECTOR3* max);
-	void ShowTreeNode(ModelBone* bone);
+	void ShowTreeNode(ModelBone* bone = NULL);
 
 
 public:

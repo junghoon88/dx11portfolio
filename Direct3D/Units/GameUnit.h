@@ -1,15 +1,15 @@
 #pragma once
-#include "../Objects/GameAnimationModel.h"
+#include "../Objects/GameModel.h"
 
 class GameWeapon;
 
-class GameUnit : public GameAnimationModel
+class GameUnit : public GameModel
 {
 public:
 	GameUnit(wstring path);
 	virtual ~GameUnit();
 
-	virtual void Update(ModelShape* modelShape);
+	virtual void Update(void);
 	virtual void Render(void);
 
 	virtual void Attack(GameUnit* target);

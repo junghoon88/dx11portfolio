@@ -56,14 +56,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./;../../_Libraries</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../_Libraries</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../_Libraries</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../_Libraries</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -99,6 +99,7 @@
     <ClCompile Include="Fbx\XmlToAnim.cpp" />
     <ClCompile Include="Gizmo\Geometry.cpp" />
     <ClCompile Include="Landscape\GameTerrain.cpp" />
+    <ClCompile Include="Landscape\Grid3Axis.cpp" />
     <ClCompile Include="Landscape\Ocean.cpp" />
     <ClCompile Include="Landscape\Terrain.cpp" />
     <ClCompile Include="Landscape\TerrainData.cpp" />
@@ -121,7 +122,6 @@
     <ClCompile Include="Model\ModelMesh.cpp" />
     <ClCompile Include="Model\ModelMeshPart.cpp" />
     <ClCompile Include="Model\ModelReader.cpp" />
-    <ClCompile Include="Objects\GameAnimationModel.cpp" />
     <ClCompile Include="Objects\GameModel.cpp" />
     <ClCompile Include="Objects\GameRender.cpp" />
     <ClCompile Include="Objects\MeshCapsule.cpp" />
@@ -159,6 +159,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Viewer\Camera.cpp" />
+    <ClCompile Include="Viewer\FixedCamera.cpp" />
     <ClCompile Include="Viewer\Free.cpp" />
     <ClCompile Include="Viewer\Orthographic.cpp" />
     <ClCompile Include="Viewer\Perspective.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Gizmo\Geometry.h" />
     <ClInclude Include="Interfaces\ICloneable.h" />
     <ClInclude Include="Landscape\GameTerrain.h" />
+    <ClInclude Include="Landscape\Grid3Axis.h" />
     <ClInclude Include="Landscape\Ocean.h" />
     <ClInclude Include="Landscape\Terrain.h" />
     <ClInclude Include="Landscape\TerrainData.h" />
@@ -209,7 +211,6 @@
     <ClInclude Include="Objects\AnimationBlender.h" />
     <ClInclude Include="Objects\AnimationClip.h" />
     <ClInclude Include="Objects\AnimationKeyframe.h" />
-    <ClInclude Include="Objects\GameAnimationModel.h" />
     <ClInclude Include="Objects\GameModel.h" />
     <ClInclude Include="Objects\GameRender.h" />
     <ClInclude Include="Objects\MeshCapsule.h" />
@@ -250,6 +251,7 @@
     <ClInclude Include="Utilities\String.h" />
     <ClInclude Include="Utilities\Xml.h" />
     <ClInclude Include="Viewer\Camera.h" />
+    <ClInclude Include="Viewer\FixedCamera.h" />
     <ClInclude Include="Viewer\Free.h" />
     <ClInclude Include="Viewer\Orthographic.h" />
     <ClInclude Include="Viewer\Perspective.h" />

@@ -21,9 +21,9 @@ MeshCapsule::~MeshCapsule()
 {
 }
 
-void MeshCapsule::Update(ModelShape * modelShape)
+void MeshCapsule::Update()
 {
-	GameModel::Update(modelShape);
+	GameModel::Update();
 
 	for (Material* material : model->GetMaterials())
 	{

@@ -151,6 +151,7 @@ const WCHAR* Path::FbxModelFilter = L"Fbx Model\0*.fbx;*.obj\0";
 const WCHAR* Path::ShaderFilter = L"HLSL file\0*.hlsl";
 const WCHAR* Path::MaterialMeshFilter = L"Material&Mesh\0*.material;*.mesh";
 const WCHAR* Path::AnimFilter = L"Animation\0*.anim";
+const WCHAR* Path::GameModelFilter = L"Game Model\0*.gmodel";
 
 void Path::OpenFileDialog(wstring file, const WCHAR* filter, wstring folder, function<void(wstring)> func, HWND hwnd)
 {
@@ -179,7 +180,7 @@ void Path::OpenFileDialog(wstring file, const WCHAR* filter, wstring folder, fun
 			String::Replace(&loadName, L"\\", L"/");
 
 			//TODO : 프로젝트 경로 변경시 수정해야함
-			String::Replace(&loadName, gWstringParentDirectory, L"../../");
+			String::Replace(&loadName, gWstringParentDirectory, L"../");
 
 			func(loadName);
 		}
@@ -212,37 +213,20 @@ void Path::SaveFileDialog(wstring file, const WCHAR* filter, wstring folder, fun
 			wstring loadName = name;
 			String::Replace(&loadName, L"\\", L"/");
 
+			//TODO : 프로젝트 경로 변경시 수정해야함
+			String::Replace(&loadName, gWstringParentDirectory, L"../");
+
+			if (Path::GetExtension(loadName).length() == 0)
+			{
+				loadName += filter;
+			}
+
+
 			func(loadName);
 		}
 	}
 }
 
-void Path::OpenPathDialog(wstring folder, function<void(wstring)> func, HWND hwnd)
-{
-	WCHAR name[255] = L"";
-	wstring tempFolder = folder;
-	String::Replace(&tempFolder, L"/", L"\\");
-
-	OPENFILENAME ofn;
-	ZeroMemory(&ofn, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = hwnd;
-	ofn.lpstrFilter = L"";
-	ofn.lpstrFile = name;
-	ofn.lpstrFileTitle = L"불러오기";
-	ofn.nMaxFile = 255;
-	ofn.lpstrInitialDir = tempFolder.c_str();
-	ofn.Flags = OFN_NOCHANGEDIR;
-
-	if (GetOpenFileName(&ofn) == TRUE)
-	{
-		if (func != NULL)
-		{
-			wstring path = Path::GetDirectoryName(name);
-			func(path);
-		}
-	}
-}
 
 ///입력 형식 
 ///path : "../Temp/"

@@ -10,7 +10,7 @@ public:
 	EnemyTank(wstring path);
 	~EnemyTank();
 
-	void Update(ModelShape* modelShape);
+	void Update(void);
 	void Render(void);
 	void PostRender(void);
 

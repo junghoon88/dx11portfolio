@@ -59,7 +59,7 @@ EnemyTank::~EnemyTank()
 	SAFE_DELETE(specData);
 }
 
-void EnemyTank::Update(ModelShape* modelShape)
+void EnemyTank::Update(void)
 {
 	ProcessAction();
 
@@ -84,7 +84,7 @@ void EnemyTank::Update(ModelShape* modelShape)
 	}
 
 
-	GameEnemy::Update(modelShape);
+	GameEnemy::Update();
 }
 
 void EnemyTank::Render(void)

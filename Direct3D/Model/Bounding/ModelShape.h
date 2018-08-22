@@ -5,6 +5,8 @@ class BoundingFrustum;
 class BoundingSphere;
 class BoundingCapsule;
 
+#define gModelShape ModelShape::Get()
+
 class DebugShape
 {
 public:
@@ -20,9 +22,16 @@ public:
 class ModelShape
 {
 public:
+	inline static ModelShape* Get(void) { return instance; }
+	inline static void Create(void) { instance = new ModelShape(); }
+	inline static void Delete(void) { SAFE_DELETE(instance); }
+
+private:
 	ModelShape();
 	~ModelShape();
+	static ModelShape* instance;
 
+public:
 	void PreRender(void);
 	void Render(void);
 	void PostRender(void);

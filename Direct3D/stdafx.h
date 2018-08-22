@@ -80,12 +80,12 @@ using namespace fbxsdk;
 //inline void Set##funName(varType& var) const { varName = var; }
 
 //TODO : 프로젝트 경로 변경시 수정해야함
-const wstring Assets     = L"../../_Assets/";
-const wstring Contents   = L"../../_Contents/";
-const wstring Textures   = L"../../_Contents/Textures/";
-const wstring Models	 = L"../../_Contents/Models/";
-const wstring Landscapes = L"../../_Contents/Landscape/";
-const wstring FbxModels  = L"../../_Contents/FbxModels/";
+const wstring Assets     = L"../_Assets/";
+const wstring Contents   = L"../_Contents/";
+const wstring Textures   = L"../_Contents/Textures/";
+const wstring Models	 = L"../_Contents/Models/";
+const wstring Landscapes = L"../_Contents/Landscape/";
+const wstring FbxModels  = L"../_Contents/FbxModels/";
 
 const wstring Shaders    = L"./Shaders/";
 const wstring LevelDatas = L"./LevelDatas/";
@@ -108,21 +108,25 @@ extern wstring  gWstringParentDirectory;
 #include "./Renders/Material.h"
 #include "./Renders/RenderTarget.h"
 
+#include "./Utilities/JsonManager.h"
+#include "./Utilities/Math.h"
+#include "./Utilities/MathDX.h"
+#include "./Utilities/String.h"
+#include "./Utilities/Path.h"
+
 #include "./Model/Component.h"
 #include "./Model/Model.h"
 #include "./Model/ModelBone.h"
 #include "./Model/ModelMesh.h"
+#include "./Model/Bounding/ModelShape.h"
+
 
 #include "./Lights/LightManager.h"
 
 #include "./Executes/GuiSettings.h"
 #include "./Executes/Execute.h"
 
-#include "./Utilities/JsonManager.h"
-#include "./Utilities/Math.h"
-#include "./Utilities/MathDX.h"
-#include "./Utilities/String.h"
-#include "./Utilities/Path.h"
+
 
 typedef VertexTextureNormalTangentBlend ModelVertexType;
 typedef VertexTexture OceanVertexType;

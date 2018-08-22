@@ -6,7 +6,6 @@
 
 #include "../Model/Bounding/BoundingBox.h"
 #include "../Model/Bounding/Ray.h"
-#include "../Model/Bounding/ModelShape.h"
 #include "PlayerBullet.h"
 #include "../Executes/DrawModel.h"
 
@@ -54,7 +53,7 @@ GamePlayer::~GamePlayer()
 	SAFE_DELETE(input);
 }
 
-void GamePlayer::Update(ModelShape* modelShape)
+void GamePlayer::Update(void)
 {
 	HandleInput();
 
@@ -71,16 +70,16 @@ void GamePlayer::Update(ModelShape* modelShape)
 	}
 
 
-	GameUnit::Update(modelShape);
+	GameUnit::Update();
 
 	box->SetSocketTransform(Transformed());
-	modelShape->AddBoundingBox(box, MathDX::Aqua);
+	gModelShape->AddBoundingBox(box, MathDX::Aqua);
 
 	D3DXVECTOR3 pos, dir;
 	GetPosition(pos);
 	GetDirection(dir);
 	Ray ray(pos, dir * 20.0f);
-	modelShape->AddLine(ray.Position, ray.Position + ray.Direction, MathDX::Yellow);
+	gModelShape->AddLine(ray.Position, ray.Position + ray.Direction, MathDX::Yellow);
 
 	ActionRotation();
 }
@@ -467,7 +466,7 @@ void GamePlayer::PlayLowerAction(LowerAction action, float startTime)
 		default: assert(false); break;
 	}
 
-	PlayAnim(indexLowerAnimations[(UINT)action], startTime, blendTime, 1.0f, mode);
+	PlayAnim(indexLowerAnimations[(UINT)action], startTime, blendTime, 1.0f);
 	curLowerAction = action;
 	prepareLowerAction = LowerAction::Unknown;
 	bOverwriteLowerAction = false;
@@ -550,7 +549,7 @@ void GamePlayer::PlayUpperAction(UpperAction action, float startTime)
 		default: assert(false); break;
 	}
 
-	PlayAnim(indexUpperAnimations[(UINT)action], startTime, blendTime, 1.0f, mode);
+	PlayAnim(indexUpperAnimations[(UINT)action], startTime, blendTime, 1.0f);
 	curUpperAction = action;
 	prepareUpperAction = UpperAction::Unknown;
 	bOverwriteUpperAction = false;

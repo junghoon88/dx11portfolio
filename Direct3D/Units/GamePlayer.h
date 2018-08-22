@@ -18,7 +18,7 @@ public:
 	GamePlayer(wstring path);
 	~GamePlayer();
 
-	void Update(ModelShape* modelShape);
+	void Update(void);
 	void Render(void);
 	void PostRender(void);
 

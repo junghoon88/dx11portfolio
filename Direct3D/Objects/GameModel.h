@@ -1,5 +1,15 @@
 #pragma once
 #include "GameRender.h"
+#include "AnimationClip.h"
+#include "AnimationBlender.h"
+
+struct AnimationBlender;
+enum class AnimationPlayMode;
+
+enum class ANIMATION_TYPE
+{
+	Unknown = -1, Mixamo, 
+};
 
 class GameModel : public GameRender
 {
@@ -7,12 +17,14 @@ private:
 	class BoneBuffer;
 	class RenderBuffer;
 
+	friend class EditModel;
+
 public:
-	GameModel(wstring file);
+	GameModel(wstring file, ANIMATION_TYPE animType = ANIMATION_TYPE::Unknown);
 	virtual ~GameModel();
 
 public:
-	virtual void Update(ModelShape* modelShape);
+	virtual void Update(void);
 	virtual void Render(void);
 	virtual void PostRender(void) {}
 
@@ -29,16 +41,42 @@ public:
 protected:
 	void CalcPosition(void);
 
+	UINT AddClipAll(wstring path);
+	UINT AddClip(wstring file, bool bLoop = false);
+	UINT AddClip(AnimationClip* clip);
+	void RemoveClip(UINT index);
+	void ClearClips(void);
+
+	AnimationClip* GetClip(UINT index);
+	AnimationBlender* GetBlenderFromBoneName(wstring name);
+
+	bool PlayAnim(UINT index);
+	bool PlayAnim(UINT index, float startTime, float blendTime, float timeScaleFactor);
+	void PauseAnim(bool pause);
+	void StopAnim(void);
+	float GetPlayTime(wstring boneName);
+	float GetPlayProgress(void);
+
+
 public:
+	inline void GetFileInfo(wstring& mat, wstring& mesh) { mat = matFile; mesh = meshFile; }
+	inline ANIMATION_TYPE GetAnimType(void) { return animType; }
+
 	inline Model* GetModel(void) { return model; }
 	inline Shader* GetShader(void) { return shader; }
 	inline wstring GetFilePath(void) { return Path::GetDirectoryName(matFile); }
 	inline wstring GetFileName(void) { return Path::GetFileNameWithoutExtension(matFile); }
-	inline void GetFileInfo(wstring& mat, wstring& mesh) { mat = matFile; mesh = meshFile; }
+
+	inline vector<AnimationBlender*>& GetBlendersRef(void) { return blenders; }
+	inline vector<AnimationClip*>& GetClipsRef(void) { return clips; }
+
+	inline vector<BoundingCapsule*>& GetCapsulesRef(void) { return capsules; }
 
 protected:
 	wstring matFile;
 	wstring meshFile;
+
+	ANIMATION_TYPE animType;
 
 	Shader* shader;
 	Model* model;
@@ -47,6 +85,15 @@ protected:
 	D3DXMATRIX rotateMatrix;
 
 	vector<D3DXMATRIX> boneTransforms;
+
+	//animation
+	vector<AnimationClip*> clips;
+	vector<AnimationBlender*> blenders;
+	bool bPause;
+
+	//capsule
+	vector<BoundingCapsule*> capsules;
+
 
 	//buffer
 	BoneBuffer*		boneBuffer;

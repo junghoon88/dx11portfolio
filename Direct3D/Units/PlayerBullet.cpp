@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "PlayerBullet.h"
 #include "../Model/Bounding/BoundingSphere.h"
-#include "../Model/Bounding/ModelShape.h"
 
 PlayerBullet::PlayerBullet(wstring modelPath, BulletType type, D3DXVECTOR3 pos, D3DXVECTOR3 dir)
 	: GameModel(modelPath)
@@ -22,7 +21,7 @@ PlayerBullet::~PlayerBullet()
 	SAFE_DELETE(sphere);
 }
 
-void PlayerBullet::Update(ModelShape* modelShape)
+void PlayerBullet::Update(void)
 {
 	switch (type)
 	{
@@ -62,7 +61,7 @@ void PlayerBullet::Update(ModelShape* modelShape)
 	D3DXMatrixTranslation(&P, position.x, position.y, position.z);
 	sphere->SetMyWorld(P);
 
-	//modelShape->AddBoundingSphere(sphere, MathDX::Red);
+	//gModelShape->AddBoundingSphere(sphere, MathDX::Red);
 }
 
 void PlayerBullet::Render(void)

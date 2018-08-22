@@ -1,1 +1,6 @@
 *.db
+Direct3D/.vs/
+Direct3D/Debug/
+_Assets/
+_Contents/
+_Libraries/

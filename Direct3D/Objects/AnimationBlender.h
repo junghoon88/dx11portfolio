@@ -142,7 +142,9 @@ struct AnimationBlender
 			}
 		}
 
-		return Negative() * matrix * Negative();
+		//XNA 아니면 그냥 matrix 로..
+		return matrix;
+		//return Negative() * matrix * Negative();
 	}
 
 	void CalcBlendingKeyframe(AnimationKeyframeData* target, AnimationKeyframeData* src, float t)

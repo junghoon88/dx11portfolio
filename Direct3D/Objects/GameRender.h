@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../Model/Bounding/ModelShape.h"
-
 class GameRender
 {
 public:
@@ -9,7 +7,7 @@ public:
 	virtual ~GameRender();
 
 public:
-	virtual void Update(ModelShape* modelShape) = 0;
+	virtual void Update(void) = 0;
 	virtual void Render(void) = 0;
 	virtual void PostRender(void) {}
 

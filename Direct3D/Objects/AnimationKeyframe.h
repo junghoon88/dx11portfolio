@@ -185,8 +185,10 @@ private:
 
 	D3DXMATRIX GetInterpolateMatrix(UINT index1, UINT index2, float t)
 	{
-		D3DXMATRIX temp;
-		D3DXMatrixIdentity(&temp);
+		D3DXMATRIX S, R, T;
+		D3DXMatrixIdentity(&S);
+		D3DXMatrixIdentity(&R);
+		D3DXMatrixIdentity(&T);
 
 		if (HasRotation() == true)
 		{
@@ -203,7 +205,7 @@ private:
 					D3DXQuaternionSlerp(&q, &Rotations[index1], &Rotations[index2], t);
 				}
 			}
-			D3DXMatrixRotationQuaternion(&temp, &q);
+			D3DXMatrixRotationQuaternion(&R, &q);
 		}
 
 		if (HasTranslation() == true)
@@ -222,9 +224,7 @@ private:
 				}
 			}
 
-			temp._41 = translation.x;
-			temp._42 = translation.y;
-			temp._43 = translation.z;
+			D3DXMatrixTranslation(&T, translation.x, translation.y, translation.z);
 		}
 
 		if (HasScale() == true)
@@ -240,16 +240,15 @@ private:
 				D3DXVec3Lerp(&scale, &Scales[index1], &Scales[index2], t);
 			}
 
-			D3DXMATRIX matS;
-			D3DXMatrixScaling(&matS, scale.x, scale.y, scale.z);
+			D3DXMatrixScaling(&S, scale.x, scale.y, scale.z);
 
 			//TODO : 왜 쌤이 temp * matS 로 했는지 이해가 안간다..
 			//D3DXMATRIX temp2 = matS * temp;
-			temp = temp * matS;
+			//temp = temp * matS;
 			//return temp2;
 		}
 
-		return temp;
+		return  S*R*T;
 	}
 
 public:

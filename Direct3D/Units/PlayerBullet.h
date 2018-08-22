@@ -1,7 +1,6 @@
 #pragma once
 
 class BoundingSphere;
-class ModelShape;
 
 #include "../Objects/GameModel.h"
 
@@ -24,7 +23,7 @@ public:
 	PlayerBullet(wstring modelPath, BulletType type, D3DXVECTOR3 pos, D3DXVECTOR3 dir);
 	~PlayerBullet();
 
-	virtual void Update(ModelShape* modelShape) override;
+	virtual void Update(void) override;
 	virtual void Render(void) override;
 	virtual void PostRender(void) override {}
 

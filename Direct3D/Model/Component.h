@@ -20,6 +20,17 @@ typedef struct TRANSFORM
 	{
 	}
 
+	D3DXMATRIX GetMatrix(void)
+	{
+		D3DXMATRIX S, R, T;
+		D3DXMatrixScaling(&S, Scale.x, Scale.y, Scale.z);
+		D3DXVECTOR3 RotRad = Math::ToRadian(RotationDeg);
+		D3DXMatrixRotationYawPitchRoll(&R, RotRad.y, RotRad.x, RotRad.z);
+		D3DXMatrixTranslation(&T, Position.x, Position.y, Position.z);
+
+		return (S*R*T);
+	}
+
 	//TRANSFROM
 	//inline void SetTransform(TRANSFORM tr)				{ transform = tr; }
 	//inline void SetTransformScale(D3DXVECTOR3 vec)		{ transform.Scale = vec; }
