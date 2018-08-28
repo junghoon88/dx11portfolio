@@ -6,6 +6,7 @@
 #include "../Fbx/Exporter.h"
 #include "../Landscape/Grid3Axis.h"
 
+#include "../Model/Bounding/BoundingBox.h"
 #include "../Model/Bounding/BoundingCapsule.h"
 
 EditModel::EditModel(ExecuteValues* values)
@@ -32,12 +33,6 @@ void EditModel::Update(void)
 		D3DXMATRIX root = transform.GetMatrix();
 		model->SetRootAxis(root);
 		model->Update();
-
-		size_t capsuleCount = model->capsules.size();
-		for (size_t i = 0; i < capsuleCount; i++)
-		{
-			gModelShape->AddBoundingCapsule(model->capsules[i], model->capsules[i]->GetColorRef());
-		}
 	}
 }
 
@@ -111,7 +106,7 @@ void EditModel::PostRenderModelProp(void)
 	ShowTreeNode();
 	ShowTransform();
 	ShowAnimationInfo();
-	ShowCapsuleInfo();
+	ShowBoundingInfo();
 }
 
 
@@ -272,6 +267,64 @@ void EditModel::OpenGameModelDialog(wstring file)
 				clipNames.push_back(make_pair(name, bLoop));
 			}
 		}
+		//5. Boundings
+		{
+			UINT count = 0;
+			Json::SetValue(val, "BoundingCount", count);
+
+
+			for (UINT i = 0; i < count; i++)
+			{
+				Json::Value valBounding = val[String::SInt("Bounding%d", i).c_str()];
+
+				int type, prop;
+				string name;
+				int socketNum;
+				D3DXCOLOR color;
+
+				Json::GetValue(valBounding, String::SInt("Type", i), type);
+				Json::GetValue(valBounding, String::SInt("Prop", i), prop);
+				Json::GetValue(valBounding, String::SInt("Name", i), name);
+				Json::GetValue(valBounding, String::SInt("SocketNum", i), socketNum);
+				Json::GetValue(valBounding, String::SInt("Color", i), color);
+
+				switch ((BoundingType)type)
+				{
+					case BoundingType::Box:
+					{
+						D3DXVECTOR3 Min, Max;
+						Json::GetValue(valBounding, String::SInt("Box-Min", i), Min);
+						Json::GetValue(valBounding, String::SInt("Box-Max", i), Max);
+
+						BoundingBox* box = new BoundingBox(model, Min, Max);
+						box->SetBoundingProp((BoundingProp)prop);
+						box->SetName(name);
+						box->SetSocketnum(socketNum);
+						box->SetColor(color);
+						model->boundings.push_back(box);
+					}
+					break;
+					case BoundingType::Sphere:
+					break;
+					case BoundingType::Capsule:
+					{
+						D3DXVECTOR3 center;
+						float radius, height;
+						Json::GetValue(valBounding, String::SInt("Capsule-Center", i), center);
+						Json::GetValue(valBounding, String::SInt("Capsule-Radius", i), radius);
+						Json::GetValue(valBounding, String::SInt("Capsule-Height", i), height);
+
+						BoundingCapsule* capsule = new BoundingCapsule(model, center, radius, height);
+						capsule->SetBoundingProp((BoundingProp)prop);
+						capsule->SetName(name);
+						capsule->SetSocketnum(socketNum);
+						capsule->SetColor(color);
+						model->boundings.push_back(capsule);
+					}
+					break;
+				}
+			}
+		}
 
 		wstring file = Path::GetDirectoryName(matFile) + Path::GetFileNameWithoutExtension(matFile);
 		model = new GameModel(file, (ANIMATION_TYPE)animType);
@@ -327,6 +380,46 @@ void EditModel::SaveGameModelDialog(wstring file)
 			{
 				Json::SetValue(val, String::SInt("AnimClip%d", i), model->GetClip(i)->fileName);
 				Json::SetValue(val, String::SInt("AnimClipLoop%d", i), model->GetClip(i)->bLoop);
+			}
+		}
+		//5. Boundings
+		{
+			UINT count = model->boundings.size();
+			Json::SetValue(val, "BoundingCount", count);
+
+
+			for (UINT i = 0; i < count; i++)
+			{
+				Json::Value valBounding;
+
+				Json::SetValue(valBounding, String::SInt("Type", i), (int)(model->boundings[i]->GetBoundingType()));
+				Json::SetValue(valBounding, String::SInt("Prop", i), (int)(model->boundings[i]->GetBoundingProp()));
+				Json::SetValue(valBounding, String::SInt("Name", i), model->boundings[i]->GetName());
+				Json::SetValue(valBounding, String::SInt("SocketNum", i), model->boundings[i]->GetSocketnum());
+				Json::SetValue(valBounding, String::SInt("Color", i), model->boundings[i]->GetColorRef());
+
+				switch (model->boundings[i]->GetBoundingType())
+				{
+					case BoundingType::Box:
+					{
+						Json::SetValue(valBounding, String::SInt("Box-Min", i), dynamic_cast<BoundingBox*>(model->boundings[i])->GetOrgMin());
+						Json::SetValue(valBounding, String::SInt("Box-Max", i), dynamic_cast<BoundingBox*>(model->boundings[i])->GetOrgMax());
+					}
+					break;
+					case BoundingType::Sphere:
+					{
+
+					}
+					break;
+					case BoundingType::Capsule:
+					{
+						Json::SetValue(valBounding, String::SInt("Capsule-Center", i), dynamic_cast<BoundingCapsule*>(model->boundings[i])->GetCenterRef());
+						Json::SetValue(valBounding, String::SInt("Capsule-Radius", i), dynamic_cast<BoundingCapsule*>(model->boundings[i])->GetRadiusRef());
+						Json::SetValue(valBounding, String::SInt("Capsule-Height", i), dynamic_cast<BoundingCapsule*>(model->boundings[i])->GetHeightRef());
+					}
+					break;
+				}
+				val[String::SInt("Bounding%d", i).c_str()] = valBounding;
 			}
 		}
 
@@ -412,14 +505,14 @@ void EditModel::ShowAnimationInfo(void)
 	ImGui::End();
 }
 
-void EditModel::ShowCapsuleInfo(void)
+void EditModel::ShowBoundingInfo(void)
 {
-	if (ImGui::Begin("Capsule List"))
+	if (ImGui::Begin("Bounding List"))
 	{
-		size_t capsuleCount = model->capsules.size();
+		size_t count = model->boundings.size();
 		static int showIndex = -1;
 		int removeIndex = -1;
-		for (size_t i = 0; i < capsuleCount; i++)
+		for (size_t i = 0; i < count; i++)
 		{
 			if (ImGui::Button(String::SInt("show info %d", i).c_str()))
 			{
@@ -437,19 +530,25 @@ void EditModel::ShowCapsuleInfo(void)
 		if (showIndex != -1)
 		{
 			ImGui::Separator();
-			model->capsules[showIndex]->PostRender();
+			model->boundings[showIndex]->PostRender();
 		}
 
 		if (removeIndex != -1)
 		{
-			model->capsules.erase(model->capsules.begin() + removeIndex);
+			model->boundings.erase(model->boundings.begin() + removeIndex);
 		}
 
 	
-		if (ImGui::Button("add"))
+		if (ImGui::Button("add Box"))
 		{
-			BoundingCapsule* capsule = new BoundingCapsule((GameUnit*)model, D3DXVECTOR3(0, 0, 0), 5, 10);
-			model->capsules.push_back(capsule);
+			BoundingBox* box = new BoundingBox(model, D3DXVECTOR3(-1, -1, -1), D3DXVECTOR3(1, 1, 1));
+			model->boundings.push_back(box);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("add Capsule"))
+		{
+			BoundingCapsule* capsule = new BoundingCapsule(model, D3DXVECTOR3(0, 0, 0), 5, 10);
+			model->boundings.push_back(capsule);
 		}
 	}
 	ImGui::End();

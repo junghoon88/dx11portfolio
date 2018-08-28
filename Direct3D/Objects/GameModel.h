@@ -5,6 +5,7 @@
 
 struct AnimationBlender;
 enum class AnimationPlayMode;
+class Bounding;
 
 enum class ANIMATION_TYPE
 {
@@ -70,7 +71,7 @@ public:
 	inline vector<AnimationBlender*>& GetBlendersRef(void) { return blenders; }
 	inline vector<AnimationClip*>& GetClipsRef(void) { return clips; }
 
-	inline vector<BoundingCapsule*>& GetCapsulesRef(void) { return capsules; }
+	inline vector<Bounding*>& GetBoundingsRef(void) { return boundings; }
 
 protected:
 	wstring matFile;
@@ -92,7 +93,7 @@ protected:
 	bool bPause;
 
 	//capsule
-	vector<BoundingCapsule*> capsules;
+	vector<Bounding*> boundings;
 
 
 	//buffer

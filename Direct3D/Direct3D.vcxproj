@@ -108,6 +108,7 @@
     <ClCompile Include="Lights\PointLight.cpp" />
     <ClCompile Include="Lights\SpotLight.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Model\Bounding\Bounding.cpp" />
     <ClCompile Include="Model\Bounding\BoundingBox.cpp" />
     <ClCompile Include="Model\Bounding\BoundingCapsule.cpp" />
     <ClCompile Include="Model\Bounding\BoundingFrustum.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Lights\LightManager.h" />
     <ClInclude Include="Lights\PointLight.h" />
     <ClInclude Include="Lights\SpotLight.h" />
+    <ClInclude Include="Model\Bounding\Bounding.h" />
     <ClInclude Include="Model\Bounding\BoundingBox.h" />
     <ClInclude Include="Model\Bounding\BoundingCapsule.h" />
     <ClInclude Include="Model\Bounding\BoundingFrustum.h" />

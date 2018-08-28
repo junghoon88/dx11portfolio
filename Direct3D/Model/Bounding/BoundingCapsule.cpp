@@ -1,23 +1,17 @@
 #include "stdafx.h"
 #include "BoundingCapsule.h"
 #include "BoundingSphere.h"
-#include "../../Units/GameUnit.h"
 
 #define SMALL_NUM (float)1e-6
 
-BoundingCapsule::BoundingCapsule(GameUnit* mymodel, D3DXVECTOR3 center, float radius, float height)
-	: mymodel(mymodel), socketnum(-1)
+BoundingCapsule::BoundingCapsule(GameModel* mymodel, D3DXVECTOR3 center, float radius, float height)
+	: Bounding(mymodel)
 	, center(center), radius(radius), height(height)
-	, color(1, 1, 0, 1)
-	, isWeapon(false), isArmor(false)
 	, sphereResolution(36.0f)
 {
 	assert(radius > 0.0f);
 
-	ZeroMemory(name, sizeof(char) * 128);
-
-	D3DXMatrixIdentity(&socketTransform);
-	D3DXMatrixIdentity(&myWorld);
+	type = BoundingType::Capsule;
 
 	InitVertices();
 }
@@ -29,54 +23,26 @@ BoundingCapsule::~BoundingCapsule()
 
 void BoundingCapsule::Update(void)
 {
-	D3DXMATRIX W, S, R, T;
-	D3DXMatrixScaling(&S, transform.Scale.x, transform.Scale.y, transform.Scale.z);
+	Bounding::Update();
 
-	D3DXVECTOR3 rot = Math::ToRadian(transform.RotationDeg);
-	D3DXMatrixRotationYawPitchRoll(&R, rot.y, rot.x, rot.z);
-	D3DXMatrixTranslation(&T, transform.Position.x, transform.Position.y, transform.Position.z);
-	W = S * R * T;
-
-	D3DXMatrixIdentity(&socketTransform);
-	if (socketnum > -1)
+	if (bShow)
 	{
-		//socketTransform = mymodel->GetModel()->GetBone(socketnum)->GetTransform();
-		socketTransform = mymodel->GetModel()->GetAbsoluteBoneTo(socketnum);
-		//W *= socketTransform;
+		gModelShape->AddBoundingCapsule(this, color);
 	}
-
-	D3DXMATRIX modelRoot;
-	mymodel->GetRootAxis(modelRoot);
-	D3DXMATRIX modelWorld;
-	mymodel->GetWorld(modelWorld);
-	//W *= modelWorld;
-
-	myWorld = W * socketTransform * (modelRoot * modelWorld);
 }
 
 void BoundingCapsule::PostRender(void)
 {
-	ImGui::InputInt("socketNum", &socketnum);
-	socketnum = Math::Clamp(socketnum, -1, mymodel->GetModel()->GetBoneCount() - 1);
+	Bounding::PostRender();
+
+	ImGui::InputFloat3("Center", center);
+	ImGui::DragFloat("Radius", &radius, 0.1f);
+	ImGui::DragFloat("Height", &height, 0.1f);
 
 	if (ImGui::Button("Clac"))
 	{
 		CalcVertices();
 	}
-
-
-	ImGui::InputFloat3("Center", center);
-	ImGui::InputFloat("Radius", &radius);
-	ImGui::InputFloat("Height", &height);
-
-	//ImGui::SliderFloat3("S", transform.Scale, -10, 10);
-	ImGui::SliderFloat3("R", transform.RotationDeg, -360, 360);
-	ImGui::SliderFloat3("T", transform.Position, -100, 100);
-
-	ImGui::InputText("Name", name, 128);
-	ImGui::SliderFloat4("Color", &color[0], 0.0f, 1.0f);
-	ImGui::Checkbox("IsWeapon", &isWeapon);
-	ImGui::Checkbox("IsArmor", &isArmor);
 }
 
 void BoundingCapsule::SetCenter(D3DXVECTOR3 vec)
@@ -109,8 +75,8 @@ void BoundingCapsule::GetCorners(vector<D3DXVECTOR3>& vec)
 
 void BoundingCapsule::InitVertices(void)
 {
-	D3DXVECTOR3 center1 = center + D3DXVECTOR3(0, 0.5f, 0) * height;
-	D3DXVECTOR3 center2 = center + D3DXVECTOR3(0, -0.5f, 0) * height;
+	D3DXVECTOR3 center1 = center + D3DXVECTOR3(0.0f,  0.5f, 0.0f) * height;
+	D3DXVECTOR3 center2 = center + D3DXVECTOR3(0.0f, -0.5f, 0.0f) * height;
 	float step = Math::TwoPI / (float)sphereResolution;
 
 	//round 2°³

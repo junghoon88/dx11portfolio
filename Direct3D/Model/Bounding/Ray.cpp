@@ -25,7 +25,7 @@ bool Ray::Intersects(BoundingBox* box, OUT float* result)
 	D3DXVECTOR3 boxMin = box->GetOrgMin();
 	D3DXVECTOR3 boxMax = box->GetOrgMax();
 
-	D3DXMATRIX mat = box->GetSocketTransform();
+	D3DXMATRIX mat = box->GetMyWorld();
 	D3DXMatrixInverse(&mat, NULL, &mat);
 
 	D3DXVECTOR3 pos, dir;

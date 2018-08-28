@@ -2,20 +2,35 @@
 #include "BoundingBox.h"
 
 
-BoundingBox::BoundingBox(D3DXVECTOR3 min, D3DXVECTOR3 max)
-	: CornerCount(8), Min(min), Max(max)
+BoundingBox::BoundingBox(GameModel* mymodel, D3DXVECTOR3 min, D3DXVECTOR3 max)
+	: Bounding(mymodel)
+	, CornerCount(8), Min(min), Max(max)
 {
-	TRANSFORM			transform;
-
-	D3DXMatrixIdentity(&socketTransform);
-	D3DXMatrixIdentity(&myWorld);
 }
 
 BoundingBox::~BoundingBox()
 {
 }
 
-vector<D3DXVECTOR3> BoundingBox::GetCorners(void)
+void BoundingBox::Update(void)
+{
+	Bounding::Update();
+
+	if (bShow)
+	{
+		gModelShape->AddBoundingBox(this, color);
+	}
+}
+
+void BoundingBox::PostRender(void)
+{
+	Bounding::PostRender();
+
+	ImGui::DragFloat3("Min", Min, 0.1f, -1000.0f, 1000.0f);
+	ImGui::DragFloat3("Max", Max, 0.1f, -1000.0f, 1000.0f);
+}
+
+void BoundingBox::GetCorners(vector<D3DXVECTOR3>& vec)
 {
 	vector<D3DXVECTOR3> corners;
 	corners.push_back(D3DXVECTOR3(Min.x, Max.y, Max.z));
@@ -27,25 +42,25 @@ vector<D3DXVECTOR3> BoundingBox::GetCorners(void)
 	corners.push_back(D3DXVECTOR3(Max.x, Min.y, Min.z));
 	corners.push_back(D3DXVECTOR3(Min.x, Min.y, Min.z));
 
-	for (size_t i = 0; i < corners.size(); i++)
+	size_t count = corners.size();
+	vec.resize(count);
+	for (size_t i = 0; i < count; i++)
 	{
-		D3DXVec3TransformCoord(&corners[i], &corners[i], &socketTransform);
+		D3DXVec3TransformCoord(&vec[i], &corners[i], &myWorld);
 	}
-
-	return corners;
 }
 
 D3DXVECTOR3 BoundingBox::GetMin(void) const
 {
 	D3DXVECTOR3 min = D3DXVECTOR3(Min.x, Min.y, Min.z);
-	D3DXVec3TransformCoord(&min, &min, &socketTransform);
+	D3DXVec3TransformCoord(&min, &min, &myWorld);
 	return min;
 }
 
 D3DXVECTOR3 BoundingBox::GetMax(void) const
 {
 	D3DXVECTOR3 max = D3DXVECTOR3(Max.x, Max.y, Max.z);
-	D3DXVec3TransformCoord(&max, &max, &socketTransform);
+	D3DXVec3TransformCoord(&max, &max, &myWorld);
 	return max;
 }
 

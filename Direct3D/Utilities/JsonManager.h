@@ -9,7 +9,7 @@ namespace Json
 	void SetValue(Json::Value& parent, string name, float& value);
 
 	void GetValue(Json::Value& parent, string name, int& value);
-	void SetValue(Json::Value& parent, string name, int& value);
+	void SetValue(Json::Value& parent, string name, int value);
 
 	void GetValue(Json::Value& parent, string name, UINT& value);
 	void SetValue(Json::Value& parent, string name, UINT& value);

@@ -280,7 +280,8 @@ void ModelShape::AddBoundingBox(BoundingBox* box, D3DXCOLOR color)
 	DebugShape* shape = GetShapeForLines(12);
 
 	// Get the corners of the box
-	vector<D3DXVECTOR3> corners = box->GetCorners();
+	vector<D3DXVECTOR3> corners;
+	box->GetCorners(corners);
 
 	// Fill in the vertices for the bottom of the box
 	shape->Vertices[0]  = VertexColor(corners[0], color);
@@ -327,10 +328,10 @@ void ModelShape::AddBoundingSphere(BoundingSphere* sphere, D3DXCOLOR color)
 	}
 }
 
-void ModelShape::AddBoundingCapsule(BoundingCapsule* cylinder, D3DXCOLOR color)
+void ModelShape::AddBoundingCapsule(BoundingCapsule* capsule, D3DXCOLOR color)
 {
 	vector<D3DXVECTOR3> vertices;
-	cylinder->GetCorners(vertices);
+	capsule->GetCorners(vertices);
 	// Get a DebugShape we can use to draw the sphere
 	DebugShape* shape = GetShapeForLines(vertices.size());
 

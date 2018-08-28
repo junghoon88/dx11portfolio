@@ -27,7 +27,7 @@ void Json::GetValue(Json::Value & parent, string name, int & value)
 	value = parent[name.c_str()].asInt();
 }
 
-void Json::SetValue(Json::Value & parent, string name, int & value)
+void Json::SetValue(Json::Value & parent, string name, int value)
 {
 	parent[name.c_str()] = value;
 }

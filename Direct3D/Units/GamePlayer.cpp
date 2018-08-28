@@ -39,7 +39,7 @@ GamePlayer::GamePlayer(wstring path)
 	attackTime = 0.0f;
 	attackNum = 1;
 
-	box = new BoundingBox(min, max);
+	box = new BoundingBox(this, min, max);
 
 	PlayLowerAction(LowerAction::Idle);
 	PlayUpperAction(UpperAction::Idle);

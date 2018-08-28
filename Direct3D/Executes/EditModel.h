@@ -39,7 +39,7 @@ private:
 	void ShowTreeNode(void);
 	void ShowTransform(void);
 	void ShowAnimationInfo(void);
-	void ShowCapsuleInfo(void);
+	void ShowBoundingInfo(void);
 
 
 private:

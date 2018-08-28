@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "GameModel.h"
 #include "../Model/Bounding/BoundingCapsule.h"
+#include "../Model/Bounding/BoundingBox.h"
+#include "../Model/Bounding/BoundingSphere.h"
 
 GameModel::GameModel(wstring file, ANIMATION_TYPE animType)
 	: animType(animType)
@@ -110,10 +112,13 @@ void GameModel::Update(void)
 		break;
 	}
 
-	size_t capsuleCount = capsules.size();
-	for (size_t i = 0; i < capsuleCount; i++)
+	//Boundings
 	{
-		capsules[i]->Update();
+		size_t count = boundings.size();
+		for (size_t i = 0; i < count; i++)
+		{
+			boundings[i]->Update();
+		}
 	}
 }
 

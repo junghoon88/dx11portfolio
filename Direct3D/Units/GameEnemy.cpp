@@ -49,7 +49,7 @@ GameEnemy::GameEnemy(wstring path)
 	aiContext->Enable(true);
 	aiContext->StartState((UINT)startAi, startAiTime);
 
-	box = new BoundingBox(min, max);
+	box = new BoundingBox(this, min, max);
 }
 
 GameEnemy::~GameEnemy()

@@ -1,33 +1,32 @@
 #pragma once
+#include "Bounding.h"
 
-class BoundingBox
+class BoundingBox : public Bounding
 {
 public:
 
 	//
-	BoundingBox(D3DXVECTOR3 min, D3DXVECTOR3 max);
+	BoundingBox(GameModel* mymodel, D3DXVECTOR3 min, D3DXVECTOR3 max);
 	~BoundingBox();
 
-	vector<D3DXVECTOR3> GetCorners(void);
+	virtual void Update(void) override;
+	virtual void PostRender(void) override;
+	virtual void GetCorners(vector<D3DXVECTOR3>& vec) override;
+
 	D3DXVECTOR3 GetMin(void) const;
 	D3DXVECTOR3 GetMax(void) const;
-	D3DXVECTOR3 GetOrgMin(void) const { return Min; }
-	D3DXVECTOR3 GetOrgMax(void) const { return Max; }
+
+	inline D3DXVECTOR3 GetOrgMin(void) const { return Min; }
+	inline D3DXVECTOR3 GetOrgMax(void) const { return Max; }
+
+	inline void SetMin(D3DXVECTOR3 vec) { Min = vec; }
+	inline void SetMax(D3DXVECTOR3 vec) { Max = vec; }
 
 public:
-	inline TRANSFORM& GetTransformRef(void) { return transform; }
-	inline void SetTransform(TRANSFORM& value) { transform = value; }
-	inline void SetSocketTransform(D3DXMATRIX& mat) { socketTransform = mat; }
-	inline D3DXMATRIX& GetSocketTransform(void) { return socketTransform; }
 
 private:
 	const int	CornerCount;
 	D3DXVECTOR3 Min;
 	D3DXVECTOR3 Max;
-
-	TRANSFORM			transform;
-	D3DXMATRIX			socketTransform;
-	D3DXMATRIX			myWorld;
-
 };
 

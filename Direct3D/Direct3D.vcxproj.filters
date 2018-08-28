@@ -214,6 +214,9 @@
     <ClCompile Include="Landscape\Grid3Axis.cpp">
       <Filter>Landscape</Filter>
     </ClCompile>
+    <ClCompile Include="Model\Bounding\Bounding.cpp">
+      <Filter>Model\Bounding</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -481,6 +484,9 @@
     </ClInclude>
     <ClInclude Include="Landscape\Grid3Axis.h">
       <Filter>Landscape</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Bounding\Bounding.h">
+      <Filter>Model\Bounding</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
