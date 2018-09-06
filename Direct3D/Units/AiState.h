@@ -6,9 +6,9 @@ struct AiState
 	wstring Name;
 	float ActiveTime;
 
-	function<void(AiState*)> Starting;
-	function<void(AiState*)> Finishing;
-	function<void(AiState*)> Updating;
+	function<void(AiState*)> Starting  = NULL;
+	function<void(AiState*)> Finishing = NULL;
+	function<void(AiState*)> Updating  = NULL;
 
 	bool IsActive() { return (ActiveTime > 0.0f); }
 

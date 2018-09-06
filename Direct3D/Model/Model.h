@@ -4,32 +4,6 @@ class ModelMesh;
 class ModelBone;
 class ModelAnimClip;
 
-class ModelBuffer : public ShaderBuffer
-{
-public:
-	ModelBuffer() : ShaderBuffer(&data, sizeof(data))
-	{
-		for (int i = 0; i < 128; i++)
-			D3DXMatrixIdentity(&data.Bones[i]);
-	}
-
-	void SetBones(D3DXMATRIX* m, UINT count)
-	{
-		assert(count <= 128);
-
-		memcpy(data.Bones, m, sizeof(D3DXMATRIX) * count);
-
-		for (UINT i = 0; i < count; i++)
-			D3DXMatrixTranspose(&data.Bones[i], &data.Bones[i]);
-	}
-
-private:
-	struct Struct
-	{
-		D3DXMATRIX Bones[128];
-	} data;
-};
-
 class Model
 {
 public:
@@ -62,6 +36,8 @@ public:
 	void ScanPointMinMax(D3DXVECTOR3* min, D3DXVECTOR3* max);
 	void ShowTreeNode(ModelBone* bone = NULL);
 
+	bool MousePickked(D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float& dist);
+
 
 public:
 	inline ModelBone* GetRoot(void) { return root; }
@@ -74,8 +50,6 @@ public:
 		return NULL;
 	}
 	inline UINT GetClipCount(void) { return clips.size(); }
-
-	inline ModelBuffer* Getbuffer(void) { return buffer; };
 
 	inline vector<ModelMesh*>& GetMeshesRef(void) { return meshes; }
 
@@ -90,9 +64,6 @@ private:
 	vector<ModelBone*>		bones;
 	vector<ModelMesh*>		meshes;
 	vector<ModelAnimClip*>	clips;
-
-
-	ModelBuffer* buffer;
 };
 
 class Models

@@ -3,13 +3,13 @@
 
 #include "./Viewer/Free.h"
 #include "./Viewer/FixedCamera.h"
+#include "./Viewer/FrustumCulling.h"
 
 
-#include "./Executes/DrawModel.h"
 #include "./Executes/EditModel.h"
 #include "./Executes/EditLevel.h"
+#include "./Executes/DrawStage.h"
 #include "./Executes/ExeGui.h"
-
 
 Program::Program()
 {
@@ -28,6 +28,7 @@ Program::~Program()
 	Json::WriteData(L"json/LevelEditor.json", values->jsonRoot);
 
 	SAFE_DELETE(values->jsonRoot);
+	SAFE_DELETE(values->FrustumCulling);
 	SAFE_DELETE(values->MainCamera);
 	SAFE_DELETE(values->GlobalLight);
 	SAFE_DELETE(values->GlobalTime);
@@ -85,6 +86,33 @@ void Program::PostRender(void)
 {
 	for (Execute* exe : executes)
 		exe->PostRender();
+
+#if 0
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Excute Menu"))
+		{
+			if (ImGui::MenuItem("Edit Level", ""))
+			{
+				SAFE_DELETE(executes[0]);
+				executes[0] = new EditLevel(values);
+			}
+			if (ImGui::MenuItem("Edit Model", ""))
+			{
+				SAFE_DELETE(executes[0]);
+				executes[0] = new EditModel(values);
+	
+			}
+			if (ImGui::MenuItem("Draw Stage", ""))
+			{
+				SAFE_DELETE(executes[0]);
+				executes[0] = new DrawStage(values);
+			}
+		}
+		ImGui::EndMenu();
+	}
+	ImGui::EndMainMenuBar();
+#endif
 }
 
 void Program::ResizeScreen(void)
@@ -103,6 +131,7 @@ void Program::InitializeValues(void)
 {
 	D3DDesc desc;
 	D3D::GetDesc(&desc);
+
 	values = new ExecuteValues();
 	values->ViewProjection = new ViewProjectionBuffer();
 	values->Perspective = new Perspective(desc.Width, desc.Height);
@@ -116,8 +145,10 @@ void Program::InitializeValues(void)
 	//values->MainCamera->SetRotationDegree(48, 0);
 
 	values->MainCamera = new FixedCamera();
-	values->MainCamera->SetPosition(0, 0, 10);
-	values->MainCamera->SetRotationDegree(0, 0);
+	values->MainCamera->SetPosition(0, 10, 10);
+	values->MainCamera->SetRotationDegree(10, 0);
+
+	values->FrustumCulling = new FrustumCulling(500.0f, values->MainCamera, values->Perspective);
 
 	values->jsonRoot = new Json::Value();
 	Json::ReadData(L"json/LevelEditor.json", values->jsonRoot);
@@ -129,8 +160,9 @@ void Program::InitializeValues(void)
 
 void Program::InitializeExecutes(void)
 {
-	executes.push_back(new EditModel(values));
-	//executes.push_back(new EditLevel(values));
+	executes.push_back(new EditLevel(values));
+	//executes.push_back(new EditModel(values));
+	//executes.push_back(new DrawStage(values));
 	executes.push_back(new ExeGui(values));
 }
 

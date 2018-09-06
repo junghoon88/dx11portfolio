@@ -2,12 +2,14 @@
 #include "EditModel.h"
 
 #include "../Objects/GameModel.h"
+#include "../Objects/GModelReadWrite.h"
 
 #include "../Fbx/Exporter.h"
 #include "../Landscape/Grid3Axis.h"
 
 #include "../Model/Bounding/BoundingBox.h"
 #include "../Model/Bounding/BoundingCapsule.h"
+
 
 EditModel::EditModel(ExecuteValues* values)
 	: Execute(values)
@@ -33,6 +35,19 @@ void EditModel::Update(void)
 		D3DXMATRIX root = transform.GetMatrix();
 		model->SetRootAxis(root);
 		model->Update();
+
+		if (gMouse->IsDown(MOUSE_LBUTTON))
+		{
+			D3DXVECTOR3 start, direction;
+			float dist;
+			values->MainCamera->GetPosition(&start);
+			direction = values->MainCamera->GetDirection(values->Viewport, values->Perspective);
+
+			if (model->MousePickked(start, direction, dist))
+			{
+				printf("");
+			}
+		}
 	}
 }
 
@@ -54,6 +69,7 @@ void EditModel::PostRender(void)
 {
 	PostRenderModelMenu();
 	PostRenderModelProp();
+	PostRenderCamera();
 }
 
 void EditModel::PostRenderModelMenu(void)
@@ -103,10 +119,51 @@ void EditModel::PostRenderModelProp(void)
 	if (model == NULL)
 		return;
 
+	ShowModelInfo();
 	ShowTreeNode();
 	ShowTransform();
 	ShowAnimationInfo();
 	ShowBoundingInfo();
+}
+
+void EditModel::PostRenderCamera(void)
+{
+	float offset = 50.0f;
+
+	ImGui::Begin("Camera View");
+	{
+		if (ImGui::Button("Top View"))
+		{
+			values->MainCamera->SetPosition(0, offset, 0);
+			values->MainCamera->SetRotationDegree(90, 0);
+		}
+		if (ImGui::Button("Bottom View"))
+		{
+			values->MainCamera->SetPosition(0, -offset, 0);
+			values->MainCamera->SetRotationDegree(-90, 0);
+		}
+		if (ImGui::Button("Left View"))
+		{
+			values->MainCamera->SetPosition(offset, 10, 0);
+			values->MainCamera->SetRotationDegree(0, -90);
+		}
+		if (ImGui::Button("Right View"))
+		{
+			values->MainCamera->SetPosition(-offset, 10, 0);
+			values->MainCamera->SetRotationDegree(0, 90);
+		}
+		if (ImGui::Button("Forward View"))
+		{
+			values->MainCamera->SetPosition(0, 10, -offset);
+			values->MainCamera->SetRotationDegree(0, 0);
+		}
+		if (ImGui::Button("Backward View"))
+		{
+			values->MainCamera->SetPosition(0, 10, offset);
+			values->MainCamera->SetRotationDegree(0, 180);
+		}
+	}
+	ImGui::End();
 }
 
 
@@ -230,109 +287,12 @@ void EditModel::OpenGameModelDialog(wstring file)
 	}
 	else
 	{
-		Json::Value root;
-		Json::ReadData(file, &root);
-		Json::Value val = root["Model Property"];
-		wstring matFile, meshFile;
+		//
+		GModelReadWriter::OpenGModel(file, GModelReadWriter::GModelReadClass::GameModel, (void**)&model);
 		D3DXMATRIX matRoot;
-		int animType = -1;
-		int clipCount = 0;
-		vector<pair<wstring, bool>> clipNames;
-
-		//1. model - matFile, meshFile
-		{
-			Json::GetValue(val, "matFile",  matFile);
-			Json::GetValue(val, "meshFile", meshFile);
-		}
-		//2. model - rootAxis
-		{
-			Json::GetValue(val, "RootTransformS", transform.Scale);
-			Json::GetValue(val, "RootTransformR", transform.RotationDeg);
-			Json::GetValue(val, "RootTransformT", transform.Position);
-		}
-		//3. animation - type
-		{
-			Json::GetValue(val, "AnimType", animType);
-		}
-		//4. animation - clips
-		{
-			Json::GetValue(val, "AnimClipCount", clipCount);
-
-			wstring name;
-			bool bLoop = false;
-			for (int i = 0; i < clipCount; i++)
-			{
-				Json::GetValue(val, String::SInt("AnimClip%d", i), name);
-				Json::GetValue(val, String::SInt("AnimClipLoop%d", i), bLoop);
-				clipNames.push_back(make_pair(name, bLoop));
-			}
-		}
-		//5. Boundings
-		{
-			UINT count = 0;
-			Json::SetValue(val, "BoundingCount", count);
-
-
-			for (UINT i = 0; i < count; i++)
-			{
-				Json::Value valBounding = val[String::SInt("Bounding%d", i).c_str()];
-
-				int type, prop;
-				string name;
-				int socketNum;
-				D3DXCOLOR color;
-
-				Json::GetValue(valBounding, String::SInt("Type", i), type);
-				Json::GetValue(valBounding, String::SInt("Prop", i), prop);
-				Json::GetValue(valBounding, String::SInt("Name", i), name);
-				Json::GetValue(valBounding, String::SInt("SocketNum", i), socketNum);
-				Json::GetValue(valBounding, String::SInt("Color", i), color);
-
-				switch ((BoundingType)type)
-				{
-					case BoundingType::Box:
-					{
-						D3DXVECTOR3 Min, Max;
-						Json::GetValue(valBounding, String::SInt("Box-Min", i), Min);
-						Json::GetValue(valBounding, String::SInt("Box-Max", i), Max);
-
-						BoundingBox* box = new BoundingBox(model, Min, Max);
-						box->SetBoundingProp((BoundingProp)prop);
-						box->SetName(name);
-						box->SetSocketnum(socketNum);
-						box->SetColor(color);
-						model->boundings.push_back(box);
-					}
-					break;
-					case BoundingType::Sphere:
-					break;
-					case BoundingType::Capsule:
-					{
-						D3DXVECTOR3 center;
-						float radius, height;
-						Json::GetValue(valBounding, String::SInt("Capsule-Center", i), center);
-						Json::GetValue(valBounding, String::SInt("Capsule-Radius", i), radius);
-						Json::GetValue(valBounding, String::SInt("Capsule-Height", i), height);
-
-						BoundingCapsule* capsule = new BoundingCapsule(model, center, radius, height);
-						capsule->SetBoundingProp((BoundingProp)prop);
-						capsule->SetName(name);
-						capsule->SetSocketnum(socketNum);
-						capsule->SetColor(color);
-						model->boundings.push_back(capsule);
-					}
-					break;
-				}
-			}
-		}
-
-		wstring file = Path::GetDirectoryName(matFile) + Path::GetFileNameWithoutExtension(matFile);
-		model = new GameModel(file, (ANIMATION_TYPE)animType);
-		model->SetRootAxis(matRoot);
-		for (int i = 0; i < clipCount; i++)
-		{
-			model->AddClip(clipNames[i].first, clipNames[i].second);
-		}
+		model->GetRootAxis(matRoot);
+		MathDX::DecomposeTransform(matRoot, transform.Scale, transform.RotationDeg, transform.Position);
+		transform.RotationDeg = Math::ToDegree(transform.RotationDeg);
 	}
 }
 
@@ -359,6 +319,7 @@ void EditModel::SaveGameModelDialog(wstring file)
 			model->GetFileInfo(matFile, meshFile);
 			Json::SetValue(val, "matFile",  matFile);
 			Json::SetValue(val, "meshFile", meshFile);
+			Json::SetValue(val, "shaderFile", model->GetShader()->GetFile());
 		}
 		//2. model - rootAxis
 		{
@@ -398,6 +359,11 @@ void EditModel::SaveGameModelDialog(wstring file)
 				Json::SetValue(valBounding, String::SInt("SocketNum", i), model->boundings[i]->GetSocketnum());
 				Json::SetValue(valBounding, String::SInt("Color", i), model->boundings[i]->GetColorRef());
 
+				TRANSFORM tr = model->boundings[i]->GetTransformRef();
+				Json::SetValue(valBounding, String::SInt("TR-RotationDeg", i), tr.RotationDeg);
+				Json::SetValue(valBounding, String::SInt("TR-Position", i), tr.Position);
+
+
 				switch (model->boundings[i]->GetBoundingType())
 				{
 					case BoundingType::Box:
@@ -426,6 +392,24 @@ void EditModel::SaveGameModelDialog(wstring file)
 		root["Model Property"] = val;
 		Json::WriteData(file, &root);
 	}
+}
+
+void EditModel::ShowModelInfo(void)
+{
+	ImGui::Begin("Model Info");
+	{
+		ImGui::Text("Shader File");
+		string shaderName = String::ToString(model->GetShader()->GetFile());
+		if (ImGui::Button(shaderName.c_str()))
+		{
+			D3DDesc desc;
+			D3D::GetDesc(&desc);
+
+			function<void(wstring)> f = bind(&GameModel::SetShader, model, placeholders::_1);
+			Path::OpenFileDialog(L"", Path::ShaderFilter, Shaders, f, desc.Handle);
+		}
+	}
+	ImGui::End();
 }
 
 void EditModel::ShowTreeNode(void)

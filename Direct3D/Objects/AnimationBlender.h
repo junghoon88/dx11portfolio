@@ -43,7 +43,7 @@ struct AnimationBlender
 		BindCount--;
 	}
 
-	void AddKeyframe(AnimationKeyframe* keyframe, float startTime, float blendTime, float timeScaleFactor, AnimationPlayMode mode)
+	void AddKeyframe(wstring clipName, AnimationKeyframe* keyframe, float startTime, float blendTime, float timeScaleFactor, AnimationPlayMode mode)
 	{
 		BlendTime = blendTime;
 		ElapsedTime = startTime;
@@ -52,7 +52,7 @@ struct AnimationBlender
 		{
 			ResetBinder();
 
-			Current->BindKeyframe(keyframe, startTime, timeScaleFactor, mode);
+			Current->BindKeyframe(clipName, keyframe, startTime, timeScaleFactor, mode);
 		}
 		else
 		{
@@ -61,9 +61,9 @@ struct AnimationBlender
 				ShiftBinder();
 
 			if (BindCount == 0)
-				Current->BindKeyframe(keyframe, startTime, timeScaleFactor, mode);
+				Current->BindKeyframe(clipName, keyframe, startTime, timeScaleFactor, mode);
 			else if (BindCount == 1)
-				Next->BindKeyframe(keyframe, startTime, timeScaleFactor, mode);
+				Next->BindKeyframe(clipName, keyframe, startTime, timeScaleFactor, mode);
 		}
 
 		BindCount++;

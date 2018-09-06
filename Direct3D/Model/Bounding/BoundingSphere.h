@@ -1,8 +1,8 @@
 #pragma once
 
-class GameUnit;
+#include "Bounding.h"
 
-class BoundingSphere
+class BoundingSphere : public Bounding
 {
 public:
 	friend class BoundingFrustum;
@@ -11,35 +11,19 @@ public:
 	float				Radius;
 
 	//
-	BoundingSphere();
+	BoundingSphere(GameModel* mymodel);
 	~BoundingSphere();
 
-	void Update(void);
-	void PostRender(void);
-
-	void GetCorners(vector<D3DXVECTOR3>& vec);
+	virtual void Update(void) override;
+	virtual void PostRender(void) override;
+	virtual void GetCorners(vector<D3DXVECTOR3>& vec) override;
 
 private:
 	void InitVertices(void);
-
-public:
-	inline void SetMyUnit(GameUnit* unit) { myUnit = unit; }
-	inline void SetSocketNum(UINT val) { socketNum = val; }
-	inline int GetSocketNum(void) { return socketNum; }
-	inline void SetMyWorld(D3DXMATRIX& mat) { myWorld = mat; }
 
 private:
 	//sphere
 	int					sphereResolution;
 	int					sphereLineCount;
 	vector<D3DXVECTOR3> unitSphere;
-
-
-	GameUnit*			myUnit;
-	int					socketNum;
-	TRANSFORM			transform;
-	D3DXMATRIX			socketTransform;
-	D3DXMATRIX			myWorld;
-
-
 };

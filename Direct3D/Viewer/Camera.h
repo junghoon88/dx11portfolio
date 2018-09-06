@@ -25,9 +25,11 @@ public:
 	inline bool GetIsMovable(void) { return isMovable; }
 
 	inline void GetPosition(D3DXVECTOR3* pos)			{ *pos = position; }
-	inline void SetPosition(float x, float y, float z)	{ position = D3DXVECTOR3(x, y, z); UpdateView(); }
 	inline void GetRotation(D3DXVECTOR2* rot)			{ *rot = rotation; }
 	inline void GetRotationDegree(D3DXVECTOR2* rot)		{ *rot = rotation * 180.0f / (float)D3DX_PI; }
+
+	inline void SetPosition(float x, float y, float z)	{ position = D3DXVECTOR3(x, y, z); UpdateView(); }
+	inline void SetPosition(D3DXVECTOR3 pos) { position = pos; UpdateView(); }
 	inline void SetRotation(float x, float y)			{ rotation = D3DXVECTOR2(x, y); UpdateRotation(); }
 	inline void SetRotationDegree(float x, float y)		{ rotation = D3DXVECTOR2(x, y) * (float)D3DX_PI / 180.0f; UpdateRotation(); }
 

@@ -3,10 +3,12 @@
 
 enum class GamePlayerKey
 {
-	MoveForward = 0, MoveBackward, MoveLeft, MoveRight,
-	TurnLeft, TurnRight,
-	WeaponFire, WeaponReload, WeaponChange,
-	Boost,
+	MoveForward = 0, MoveBackward, MoveLeft, MoveRight, Run,
+	RotateLeft, RotateRight,
+	Slash, //Mouse
+	Slash_3combo, Kick, Charge_Attack, High_Spin_Attack,
+	Power_Up,
+	Spell_Cast,
 
 	Count
 };
@@ -19,18 +21,23 @@ private:
 public:
 	GamePlayerInput()
 	{
-		SetGameKey(GamePlayerKey::MoveForward,	'W');
-		SetGameKey(GamePlayerKey::MoveBackward, 'S');
-		SetGameKey(GamePlayerKey::MoveLeft,		'A');
-		SetGameKey(GamePlayerKey::MoveRight,	'D');
+		SetGameKey(GamePlayerKey::MoveForward,		'W');
+		SetGameKey(GamePlayerKey::MoveBackward,		'S');
+		SetGameKey(GamePlayerKey::MoveLeft,			'A');
+		SetGameKey(GamePlayerKey::MoveRight,		'D');
+		SetGameKey(GamePlayerKey::Run,				VK_LSHIFT);
+		SetGameKey(GamePlayerKey::RotateLeft,		'Q');
+		SetGameKey(GamePlayerKey::RotateRight,		'E');
 
-		SetGameKey(GamePlayerKey::TurnLeft,		'F');
-		SetGameKey(GamePlayerKey::TurnRight,	'H');
+		SetGameKey(GamePlayerKey::Slash,			MOUSE_LBUTTON);
 
-		SetGameKey(GamePlayerKey::WeaponFire,	'G');
-		SetGameKey(GamePlayerKey::WeaponReload, 'T');
-		SetGameKey(GamePlayerKey::WeaponChange, 'V');
-		SetGameKey(GamePlayerKey::Boost,		VK_SPACE);
+		SetGameKey(GamePlayerKey::Slash_3combo,		'1');
+		SetGameKey(GamePlayerKey::Kick,				'F');
+		SetGameKey(GamePlayerKey::Charge_Attack,	'2');
+		SetGameKey(GamePlayerKey::High_Spin_Attack, '3');
+
+		SetGameKey(GamePlayerKey::Power_Up,			'4');
+		SetGameKey(GamePlayerKey::Spell_Cast,		'5');
 	}
 
 
@@ -41,43 +48,57 @@ public:
 
 	bool Pressed(GamePlayerKey key)
 	{
-		bool res = true;
-		res &= (gMouse->IsPress(MOUSE_RBUTTON) == false);
-		res &= gKeyboard->IsPress(keyboard[(UINT)key]);
-		return res;
+		if (key == GamePlayerKey::Slash)
+		{
+			return gMouse->IsPress(keyboard[(UINT)key]);
+		}
+		else
+		{
+			return gKeyboard->IsPress(keyboard[(UINT)key]);
+		}
 	}
 
 	bool Released(GamePlayerKey key)
 	{
-		bool res = true;
-		res &= (gMouse->IsPress(MOUSE_RBUTTON) == false);
-		res &= gKeyboard->IsUp(keyboard[(UINT)key]);
-		return res;
+		if (key == GamePlayerKey::Slash)
+		{
+			return gMouse->IsUp(keyboard[(UINT)key]);
+		}
+		else
+		{
+			return gKeyboard->IsUp(keyboard[(UINT)key]);
+		}
 	}
 
 	bool Stroke(GamePlayerKey key)
 	{
-		bool res = true;
-		res &= (gMouse->IsPress(MOUSE_RBUTTON) == false);
-		res &= gKeyboard->IsDown(keyboard[(UINT)key]);
-		return res;
+		if (key == GamePlayerKey::Slash)
+		{
+			return gMouse->IsDown(keyboard[(UINT)key]);
+		}
+		else
+		{
+			return gKeyboard->IsDown(keyboard[(UINT)key]);
+		}
 	}
 
-	bool IsPressTurn()
-	{
-		bool res = false;
-		res |= Pressed(GamePlayerKey::TurnLeft);
-		res |= Pressed(GamePlayerKey::TurnRight);
-		return res;
-	}
-
-	bool IsPressMovement()
+	bool IsPressMovement(void)
 	{
 		bool res = false;
 		res |= Pressed(GamePlayerKey::MoveForward);
 		res |= Pressed(GamePlayerKey::MoveBackward);
 		res |= Pressed(GamePlayerKey::MoveLeft);
 		res |= Pressed(GamePlayerKey::MoveRight);
+		return res;
+	}
+
+	bool IsPressRotate(void)
+	{
+		bool res = false;
+		res |= Pressed(GamePlayerKey::RotateLeft);
+		res |= Pressed(GamePlayerKey::RotateRight);
+		res |= gMouse->IsPress(MOUSE_RBUTTON);
+
 		return res;
 	}
 };

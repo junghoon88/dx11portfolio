@@ -8,6 +8,7 @@ Bounding::Bounding(GameModel * mymodel)
 	, color(1, 1, 0, 1)
 	, prop(BoundingProp::Unknown)
 	, bShow(false)
+	, bEnable(false)
 {
 	D3DXMatrixIdentity(&socketTransform);
 	D3DXMatrixIdentity(&myWorld);
@@ -20,12 +21,16 @@ void Bounding::Update(void)
 	D3DXMatrixIdentity(&socketTransform);
 
 	D3DXMATRIX modelRoot, modelWorld;
-	mymodel->GetRootAxis(modelRoot);
-	mymodel->GetWorld(modelWorld);
+	D3DXMatrixIdentity(&modelRoot);
+	D3DXMatrixIdentity(&modelWorld);
 
-	if (mymodel != NULL && socketnum > -1)
+	if (mymodel != NULL)
 	{
-		socketTransform = mymodel->GetModel()->GetAbsoluteBoneTo(socketnum);
+		if (socketnum > -1)
+			socketTransform = mymodel->GetModel()->GetAbsoluteBoneTo(socketnum);
+
+		mymodel->GetRootAxis(modelRoot);
+		mymodel->GetWorld(modelWorld);
 	}
 
 	myWorld = W * socketTransform * (modelRoot * modelWorld);

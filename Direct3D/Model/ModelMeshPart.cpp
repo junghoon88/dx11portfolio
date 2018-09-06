@@ -108,3 +108,27 @@ void ModelMeshPart::ScanPointMinMax(D3DXVECTOR3 * min, D3DXVECTOR3 * max, D3DXMA
 	if (max->z < pointMax.z)	max->z = pointMax.z;
 }
 
+bool ModelMeshPart::MousePickked(D3DXMATRIX& matParent, D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float& dist)
+{
+	//마우스 피킹
+	UINT size = vertices.size();
+	for (UINT i = 0; i < size; i += 3)
+	{
+		float u, v, distance;
+
+		D3DXVECTOR3 p1, p2, p3;
+		D3DXVec3TransformCoord(&p1, &vertices[i  ].position, &matParent);
+		D3DXVec3TransformCoord(&p2, &vertices[i+1].position, &matParent);
+		D3DXVec3TransformCoord(&p3, &vertices[i+2].position, &matParent);
+
+		if (D3DXIntersectTri(&p1, &p2, &p3,
+							 &start, &direction, &u, &v, &distance) == TRUE)
+		{
+			dist = distance;
+			return true;
+		}
+	}
+
+	dist = 0.0f;
+	return false;
+}

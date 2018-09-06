@@ -69,3 +69,16 @@ void ModelMesh::ScanPointMinMax(D3DXVECTOR3 * min, D3DXVECTOR3 * max)
 	}
 }
 
+bool ModelMesh::MousePickked(D3DXMATRIX& matParent, D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float & dist)
+{
+	for (ModelMeshPart* part : meshParts)
+	{
+		if (part->MousePickked(matParent, start, direction, dist))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+

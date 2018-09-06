@@ -101,11 +101,14 @@ float Math::ToDegree(float radian)
 	return radian * 180.0f / PI;
 }
 
-int Math::RandomRange(int r1, int r2)
+D3DXVECTOR3 Math::ToDegree(D3DXVECTOR3 vec)
 {
-	return (int)(rand() % (r2 - r1 + 1)) + r1;
+	D3DXVECTOR3 res;
+	res.x = vec.x * 180.0f / PI;
+	res.y = vec.y * 180.0f / PI;
+	res.z = vec.z * 180.0f / PI;
+	return res;
 }
-
 
 float Math::WrapAngle(float angle, bool isDegree)
 {
@@ -134,7 +137,10 @@ float Math::WrapAngleRad(float angle)
 	return WrapAngle(angle, false);
 }
 
-
+int Math::Random(int r1, int r2)
+{
+	return (int)(rand() % (r2 - r1 + 1)) + r1;
+}
 float Math::Random(float r1, float r2)
 {
 	float random = ((float)rand()) / (float)RAND_MAX;
@@ -180,7 +186,3 @@ float Math::Fraction(float f1)
 	return f1 - (float)i1;
 }
 
-int Math::Random(int r1, int r2)
-{
-	return (int)(rand() % (r2 - r1 + 1)) + r1;
-}

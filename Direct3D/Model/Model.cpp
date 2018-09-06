@@ -5,13 +5,10 @@
 Model::Model()
 	: root(NULL)
 {
-	buffer = new ModelBuffer();
 }
 
 Model::~Model()
 {
-	SAFE_DELETE(buffer);
-
 	for (Material* mat : materials)
 		SAFE_DELETE(mat);
 
@@ -152,6 +149,47 @@ void Model::ShowTreeNode(ModelBone* bone)
 		ImGui::TreePop();
 	}
 }
+
+//bool Model::MousePickked(D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float & dist)
+//{
+//	size_t size = meshes.size();
+//
+//	vector<float> distances;
+//	for (size_t i = 0; i < size; i++)
+//	{
+//		float temp;
+//		if (meshes[i]->MousePickked(start, direction, temp))
+//		{
+//			distances.push_back(temp);
+//		}
+//	}
+//	
+//	if (distances.size() > 0)
+//	{
+//
+//		return true;
+//	}
+//
+//	vector<D3DXMATRIX> transforms;
+//	CopyAbsoluteBoneTo(transforms);
+//
+//	for (ModelMesh* mesh : meshes)
+//	{
+//		int index = mesh->GetParentBoneIndex();
+//		D3DXMATRIX transform = transforms[index];
+//
+//		mesh->SetWorld(transform);
+//		
+//		float temp;
+//		if (mesh->MousePickked(start, direction, temp))
+//		{
+//			distances.push_back(temp);
+//		}
+//	}
+//
+//	
+//	return false;
+//}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

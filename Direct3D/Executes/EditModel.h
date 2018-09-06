@@ -26,6 +26,7 @@ public:
 private:
 	void PostRenderModelMenu(void);
 	void PostRenderModelProp(void);
+	void PostRenderCamera(void);
 
 	void OpenExportDialog(EXPORT_MODE mode, wstring file = L"");
 	void ExportMatMesh(wstring fbxFile, wstring saveFile);
@@ -36,6 +37,7 @@ private:
 	void SaveGameModelDialog(wstring file = L"");
 
 
+	void ShowModelInfo(void);
 	void ShowTreeNode(void);
 	void ShowTransform(void);
 	void ShowAnimationInfo(void);

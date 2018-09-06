@@ -1,22 +1,19 @@
 #include "stdafx.h"
 #include "GameUnit.h"
-#include "GameWeapon.h"
 #include "GameData.h"
 
-GameUnit::GameUnit(wstring path)
-	: GameModel(path)
-	, curWeapon(NULL)
-	, curWeaponSlot(-1)
+GameUnit::GameUnit(wstring matmeshFile, ANIMATION_TYPE animType)
+	: GameModel(matmeshFile, animType)
 {
-	min = D3DXVECTOR3(Math::FloatMaxValue, Math::FloatMaxValue, Math::FloatMaxValue);
-	max = D3DXVECTOR3(Math::FloatMinValue, Math::FloatMinValue, Math::FloatMinValue);
-	model->ScanPointMinMax(&min, &max);
-
-	AddClipAll(path);
-
-	life = maxLife = 0;
-
-	D3DXMatrixIdentity(&spawnPoint);
+	Level = 0;
+	HP = 0.0f;
+	HPMax = 0.0f;
+	MP = 0.0f;
+	MPMax = 0.0f;
+	Exp = 0.0f;
+	ExpMax = 0.0f;
+	Atk = 0.0f;
+	Dep = 0.0f;
 }
 
 GameUnit::~GameUnit()
@@ -33,71 +30,10 @@ void GameUnit::Render(void)
 	GameModel::Render();
 }
 
-void GameUnit::Attack(GameUnit * target)
+void GameUnit::Attack(GameUnit* target)
 {
 }
 
-void GameUnit::Hit(GameUnit * target)
+void GameUnit::Hit(GameUnit* target)
 {
 }
-
-bool GameUnit::MousePickked(BoundingFrustum * cameraFrustum)
-{
-	return false;
-}
-
-bool GameUnit::MousePickked(D3DXVECTOR3 start, D3DXVECTOR3 dir, OUT map<float, ModelMeshPart*>& pickkedParts)
-{
-	float dist = 0.0f;
-
-	for (UINT i = 0; i < model->GetMeshCount(); i++)
-	{
-		//for (ModelMeshPart* part : model->GetMeshesRef()[i]-> meshParts)
-		//{
-		//	if (part->MousePickked(start, direction, dist))
-		//	{
-		//		pickkedParts[dist] = part;
-		//	}
-		//}
-	}
-
-	if (pickkedParts.size() > 0)
-		return true;
-
-	return false;
-}
-
-void GameUnit::CreateWeapon(wstring matFile, wstring meshFile)
-{
-	GameWeaponSpec* spec = new GameWeaponSpec();
-	//TODO : 스펙 데이터 로딩
-
-	GameWeapon* weapon = new GameWeapon();
-	weapon->SetSpecData(spec);
-	weapons.push_back(weapon);
-	//TODO : 무기 장착
-
-	SelectWeapon(0);
-}
-
-void GameUnit::SelectWeapon(UINT slot)
-{
-	assert(slot < weapons.size());
-	curWeapon = weapons[slot];
-	curWeaponSlot = slot;
-
-	for (size_t i = 0; i < weapons.size(); i++)
-	{
-		if (i == slot)
-		{
-			weapons[i]->SetVisible(true);
-			weapons[i]->SetEnable(true);
-		}
-		else
-		{
-			weapons[i]->SetVisible(false);
-			weapons[i]->SetEnable(false);
-		}
-	}
-}
-

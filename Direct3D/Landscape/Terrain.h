@@ -1,6 +1,11 @@
 #pragma once
 
+#include "../GamePlayManager/EnemyRespawnManager.h"
+
 #define TEXTURE_MAX		6
+
+#define ENEMYAREA_MAX	10	//수정시 shader 파일도 수정해야함
+
 
 class AStar;
 
@@ -17,70 +22,27 @@ namespace Landscape
 
 	enum eEditMode
 	{
+		EDITMODE_ALPHATEXTURE,
 		EDITMODE_HEIGHTUPDOWN,
 		EDITMODE_HEIGHTSMOOTH,
-		EDITMODE_ALPHATEXTURE,
 		EDITMODE_MAKETREE,
+		EDITMODE_ENEMYAREA,
 		EDITMODE_ASTARTEST,
 
 		EDITMODE_MAX
 	};
 
 	class TerrainData;
+	class TerrainQuadTree;
 	class Tree;
 
-	class GridBuffer : public ShaderBuffer
-	{
-	public:
-		GridBuffer() : ShaderBuffer(&Data, sizeof(Struct))
-		{
-			Data.bView = 0;
-			Data.GridSpacing = 1;
-			Data.GridThickness = 0.03f;
-
-			Data.BrushType = BRUSHTYPE_NONE; //enum eBrushType
-			Data.Radius = 5.0f;
-			Data.Position = D3DXVECTOR2(0, 0);
-
-			Data.HoverGridStart  = D3DXVECTOR2(0, 0);
-			Data.HoverGridSize   = D3DXVECTOR2(0, 0);
-			Data.SelectGridStart = D3DXVECTOR2(0, 0);
-			Data.SelectGridSize  = D3DXVECTOR2(0, 0);
-
-			Data.ColorGrid     = D3DXCOLOR(1, 1, 1, 1);
-
-			Data.ColorHover    = D3DXCOLOR(1, 0, 0, 1);
-			Data.ColorSelected = D3DXCOLOR(0, 0, 1, 1);
-		}
-
-		struct Struct
-		{
-			UINT		bView;
-			UINT		GridSpacing;
-			float		GridThickness;
-			float		Padding;
-
-			//brush
-			UINT		BrushType; //enum eBrushType
-			float		Radius;
-			D3DXVECTOR2 Position;
-
-			//grid
-			D3DXVECTOR2 HoverGridStart;
-			D3DXVECTOR2 HoverGridSize;
-			D3DXVECTOR2 SelectGridStart;
-			D3DXVECTOR2 SelectGridSize;
-
-
-			D3DXCOLOR	ColorGrid;
-
-			D3DXCOLOR	ColorHover;
-			D3DXCOLOR	ColorSelected;
-		} Data;
-	};
 
 	class Terrain
 	{
+	private:
+		class GridBuffer;
+		class EnemyAreaBuffer;
+
 	public:
 		Terrain(ExecuteValues* values);
 		~Terrain();
@@ -98,6 +60,10 @@ namespace Landscape
 		void UpdateMouse(void);
 		void UpdateKeyboard(void);
 		void PostRenderEditMenu(void);
+
+		void PostRenderHeightMap(void);
+		void PostRenderTextures(void);
+		void PostRenderEnemyArea(void);
 
 		//void AddTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ, int intensity);
 		//void AddTrees(D3DXVECTOR2 positionXZ, float radius, int intensity);
@@ -118,19 +84,21 @@ namespace Landscape
 
 
 	public:
-		inline TerrainData* GetTerrainData(void) { return terrainData; }
+		//inline TerrainData* GetTerrainData(void) { return terrainData; }
 		inline UINT GetGridSpacing(void) { assert(gridBuffer != NULL); return gridBuffer->Data.GridSpacing; }
 		//inline AStar* GetAStar(void) { return astar; }
-
+		inline vector<EnemyArea>& GetEnemyAreasRef(void) { return enemyAreas; }
 
 	private:
 		ExecuteValues*		values;
 
-		TerrainData*		terrainData;
+		//TerrainData*		terrainData;
+		TerrainQuadTree*		terrainData;
 
 		Material*			material;
 		WorldBuffer*		worldBuffer;
 		GridBuffer*			gridBuffer;
+		EnemyAreaBuffer*    enemyAreaBuffer;
 
 		ID3D11SamplerState* diffuseSampler;
 		ID3D11SamplerState* detailSampler;
@@ -154,6 +122,95 @@ namespace Landscape
 
 		//Astar test
 		//AStar* astar;
+
+		vector<EnemyArea>		enemyAreas;
+		int						showAreaIndex;
+
+
+	private:
+		class GridBuffer : public ShaderBuffer
+		{
+		public:
+			GridBuffer() : ShaderBuffer(&Data, sizeof(Struct))
+			{
+				Data.bView = 0;
+				Data.GridSpacing = 1;
+				Data.GridThickness = 0.03f;
+
+				Data.BrushType = BRUSHTYPE_NONE; //enum eBrushType
+				Data.Radius = 5.0f;
+				Data.Position = D3DXVECTOR2(0, 0);
+
+				Data.HoverGridStart = D3DXVECTOR2(0, 0);
+				Data.HoverGridSize = D3DXVECTOR2(0, 0);
+				Data.SelectGridStart = D3DXVECTOR2(0, 0);
+				Data.SelectGridSize = D3DXVECTOR2(0, 0);
+
+				Data.ColorGrid = D3DXCOLOR(1, 1, 1, 1);
+
+				Data.ColorHover = D3DXCOLOR(1, 0, 0, 1);
+				Data.ColorSelected = D3DXCOLOR(0, 0, 1, 1);
+			}
+
+			struct Struct
+			{
+				UINT		bView;
+				UINT		GridSpacing;
+				float		GridThickness;
+				float		Padding;
+
+				//brush
+				UINT		BrushType; //enum eBrushType
+				float		Radius;
+				D3DXVECTOR2 Position;
+
+				//grid
+				D3DXVECTOR2 HoverGridStart;
+				D3DXVECTOR2 HoverGridSize;
+				D3DXVECTOR2 SelectGridStart;
+				D3DXVECTOR2 SelectGridSize;
+
+
+				D3DXCOLOR	ColorGrid;
+
+				D3DXCOLOR	ColorHover;
+				D3DXCOLOR	ColorSelected;
+			} Data;
+		};
+
+		class EnemyAreaBuffer : public ShaderBuffer
+		{
+		public:
+			EnemyAreaBuffer() : ShaderBuffer(&Data, sizeof(Struct))
+			{
+				for (size_t i = 0; i < ENEMYAREA_MAX; i++)
+				{
+					Data.area[i].Start = D3DXVECTOR2(0, 0);
+					Data.area[i].Size  = D3DXVECTOR2(0, 0);
+					Data.area[i].Color = D3DXCOLOR(1, 1, 1, 1);
+				}
+			}
+
+			void SetArea(size_t index, EnemyArea& area)
+			{
+				Data.area[index].Start = area.Start;
+				Data.area[index].Size  = area.Size;
+				Data.area[index].Color = area.Color;
+			}
+
+		private:
+			struct Area
+			{
+				D3DXVECTOR2 Start;
+				D3DXVECTOR2 Size;
+				D3DXCOLOR   Color;
+			};
+
+			struct Struct
+			{
+				Area area[ENEMYAREA_MAX];
+			} Data;
+		};
 	};
 
 }

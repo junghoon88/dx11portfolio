@@ -3,6 +3,9 @@
 class MathDX
 {
 public:
+	static const D3DXVECTOR3 Vector3MinValue;
+	static const D3DXVECTOR3 Vector3MaxValue;
+
 	static const D3DXCOLOR Red;
 	static const D3DXCOLOR Green;
 	static const D3DXCOLOR Blue;
@@ -13,6 +16,9 @@ public:
 	static const D3DXCOLOR Black;
 
 	static const D3DXMATRIX matIdentity;
+
+	static void GetMinValue(IN D3DXVECTOR3& vec1, OUT D3DXVECTOR3& vec2);
+	static void GetMaxValue(IN D3DXVECTOR3& vec1, OUT D3DXVECTOR3& vec2);
 
 	static bool DecomposeTransform(D3DXMATRIX& mat, D3DXVECTOR3& vs, D3DXVECTOR3& vr, D3DXVECTOR3& vt);
 	static void DecomposeTransform(D3DXMATRIX& mat, D3DXVECTOR3& vr, D3DXVECTOR3& vt);

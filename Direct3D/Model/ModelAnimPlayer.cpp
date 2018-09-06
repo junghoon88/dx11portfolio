@@ -47,12 +47,12 @@ void ModelAnimPlayer::Update(D3DXMATRIX& matWorld)
 		skinTransform[i] = skinTransform[i] * matWorld;
 	}
 
-	model->Getbuffer()->SetBones(&skinTransform[0], skinTransform.size());
+	//model->Getbuffer()->SetBones(skinTransform);
 }
 
 void ModelAnimPlayer::Render(void)
 {
-	model->Getbuffer()->SetVSBuffer(2);
+	//model->Getbuffer()->SetVSBuffer(2);
 
 	for (ModelMesh* mesh : model->GetMeshesRef())
 		mesh->Render();

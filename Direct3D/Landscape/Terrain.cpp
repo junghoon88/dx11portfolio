@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Terrain.h"
 #include "TerrainData.h"
+#include "TerrainQuadTree.h"
 //#include "Tree.h"
 //#include "AStar.h"
 
@@ -15,13 +16,15 @@ Landscape::Terrain::Terrain(ExecuteValues* values)
 	: values(values)
 	, material(NULL)
 	, terrainData(NULL)
-	, editmode(EDITMODE_HEIGHTUPDOWN)
+	, editmode(EDITMODE_ALPHATEXTURE)
 	, intensity(1)
 	, vertexDataOld(NULL)
 	, bChangeTerrain(false)
+	, showAreaIndex(0)
 {
 	worldBuffer = new WorldBuffer();
 	gridBuffer  = new GridBuffer();
+	enemyAreaBuffer = new EnemyAreaBuffer();
 	
 	D3D11_SAMPLER_DESC samplerDesc;
 	States::GetSamplerDesc(&samplerDesc);
@@ -66,6 +69,7 @@ Landscape::Terrain::~Terrain()
 	SAFE_DELETE(terrainData);
 
 	SAFE_DELETE(gridBuffer);
+	SAFE_DELETE(enemyAreaBuffer);
 	SAFE_DELETE(worldBuffer);
 	SAFE_DELETE(material);
 }
@@ -118,13 +122,34 @@ void Landscape::Terrain::LoadData(Json::Value * value)
 		{
 			Json::GetValue(terrainValue, String::SInt("Textures%d", i), alphaTextures[i]);
 		}
+
+		//EnemyArea
+		{
+			Json::Value enemyAreaValue = terrainValue["EnemyArea"];
+			if (enemyAreaValue.isNull() == false)
+			{
+				size_t count = 0;
+				Json::GetValue(enemyAreaValue, "EnemyAreaCount", count);
+				for (size_t i = 0; i < count; i++)
+				{
+					EnemyArea area;
+					Json::GetValue(enemyAreaValue, String::SInt("EnemyArea%d-Name", i),  area.Name);
+					Json::GetValue(enemyAreaValue, String::SInt("EnemyArea%d-Start", i), area.Start);
+					Json::GetValue(enemyAreaValue, String::SInt("EnemyArea%d-Size", i),  area.Size);
+					Json::GetValue(enemyAreaValue, String::SInt("EnemyArea%d-Color", i), area.Color);
+
+					enemyAreas.push_back(area);
+				}
+			}
+		}
 	}
 
 	material = new Material(shaderFile);
 	material->SetDiffuseMap(diffuseMap);
 	material->SetDetailMap(detailMap);
 
-	terrainData = new TerrainData(heightMap);
+	//terrainData = new TerrainData(heightMap);
+	terrainData = new TerrainQuadTree(heightMap);
 
 	for (UINT i = 0; i < ALPHAMAP_MAX; i++)
 	{
@@ -186,6 +211,21 @@ void Landscape::Terrain::SaveData(Json::Value * value)
 		Json::SetValue(terrainValue, String::SInt("Textures%d", i), textures[i]->GetFile());
 	}
 
+	//EnemyArea
+	{
+		Json::Value enemyAreaValue;
+		size_t count = enemyAreas.size();
+		Json::SetValue(enemyAreaValue, "EnemyAreaCount", count);
+		for (size_t i = 0; i < count; i++)
+		{
+			Json::SetValue(enemyAreaValue, String::SInt("EnemyArea%d-Name",  i), enemyAreas[i].Name);
+			Json::SetValue(enemyAreaValue, String::SInt("EnemyArea%d-Start", i), enemyAreas[i].Start);
+			Json::SetValue(enemyAreaValue, String::SInt("EnemyArea%d-Size",  i), enemyAreas[i].Size);
+			Json::SetValue(enemyAreaValue, String::SInt("EnemyArea%d-Color", i), enemyAreas[i].Color);
+		}
+		terrainValue["EnemyArea"] = enemyAreaValue;
+	}
+
 	(*value)["Landscape"]["Terrain"] = terrainValue;
 }
 
@@ -209,6 +249,35 @@ void Landscape::Terrain::Update(void)
 		tree->Update();
 	}
 #endif
+
+	if (editmode == EDITMODE_ENEMYAREA)
+	{
+		EnemyArea blank;
+		blank.Size = D3DXVECTOR2(0, 0);
+
+		for (size_t i = 0; i < ENEMYAREA_MAX; i++)
+		{
+			if (i < enemyAreas.size() && enemyAreas[i].Show)
+			{
+				enemyAreaBuffer->SetArea(i, enemyAreas[i]);
+			}
+			else
+			{
+				enemyAreaBuffer->SetArea(i, blank);
+			}
+		}
+	}
+	else
+	{
+		EnemyArea blank;
+		blank.Size = D3DXVECTOR2(0, 0);
+
+		for (size_t i = 0; i < ENEMYAREA_MAX; i++)
+		{
+			enemyAreaBuffer->SetArea(i, blank);
+		}
+	}
+
 }
 
 void Landscape::Terrain::Render(void)
@@ -217,6 +286,7 @@ void Landscape::Terrain::Render(void)
 	{
 		worldBuffer->SetVSBuffer(1);
 		gridBuffer->SetPSBuffer(2);
+		enemyAreaBuffer->SetPSBuffer(3);
 		material->SetBuffer();
 
 		Texture::SetShaderResources(5, TEXTURE_MAX, textures);
@@ -224,7 +294,7 @@ void Landscape::Terrain::Render(void)
 		gDC->PSSetSamplers(0, 1, &diffuseSampler);
 		gDC->PSSetSamplers(1, 1, &detailSampler);
 
-		terrainData->Render();
+		terrainData->Render(values->FrustumCulling);
 	}
 
 
@@ -314,6 +384,41 @@ void Landscape::Terrain::UpdateMouse(void)
 
 			switch (editmode)
 			{
+				case EDITMODE_ALPHATEXTURE:
+				{
+					if (gMouse->IsPress(MOUSE_LBUTTON))
+					{
+						if (!bChangeTerrain)
+						{
+							bChangeTerrain = true;
+							terrainData->CopyVertexDataTo(&vertexDataOld);
+						}
+
+						if (gKeyboard->IsPress(VK_SHIFT))
+						{
+							terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.Position, gridBuffer->Data.Radius, -intensity);
+						}
+						else
+						{
+							terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.Position, gridBuffer->Data.Radius, intensity);
+						}
+					}
+					else
+					{
+						if (bChangeTerrain)
+						{
+							VertexTypePTNC2* vertexDataNew = NULL;
+							terrainData->CopyVertexDataTo(&vertexDataNew);
+
+							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
+							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
+
+							vertexDataOld = NULL;
+							bChangeTerrain = false;
+						}
+					}
+				}
+				break;
 				case EDITMODE_HEIGHTUPDOWN:
 				{
 					if (gMouse->IsPress(MOUSE_LBUTTON))
@@ -377,41 +482,6 @@ void Landscape::Terrain::UpdateMouse(void)
 					}
 				}
 				break;
-				case EDITMODE_ALPHATEXTURE:
-				{
-					if (gMouse->IsPress(MOUSE_LBUTTON))
-					{
-						if (!bChangeTerrain)
-						{
-							bChangeTerrain = true;
-							terrainData->CopyVertexDataTo(&vertexDataOld);
-						}
-
-						if (gKeyboard->IsPress(VK_SHIFT))
-						{
-							terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.Position, gridBuffer->Data.Radius, -intensity);
-						}
-						else
-						{
-							terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.Position, gridBuffer->Data.Radius, intensity);
-						}
-					}
-					else
-					{
-						if (bChangeTerrain)
-						{
-							VertexTypePTNC2* vertexDataNew = NULL;
-							terrainData->CopyVertexDataTo(&vertexDataNew);
-
-							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
-							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
-
-							vertexDataOld = NULL;
-							bChangeTerrain = false;
-						}
-					}
-				}
-				break;
 				case EDITMODE_MAKETREE:
 				{
 #if USE_TREE
@@ -436,39 +506,15 @@ void Landscape::Terrain::UpdateMouse(void)
 		{
 			MousePick();
 
-			//Grid Select
-			if (gMouse->IsDown(MOUSE_LBUTTON))
-			{
-				clickedGrid = gridBuffer->Data.HoverGridStart;
-				gridBuffer->Data.SelectGridStart = gridBuffer->Data.HoverGridStart;
-				gridBuffer->Data.SelectGridSize = D3DXVECTOR2(1, 1) * (float)gridBuffer->Data.GridSpacing;
-			}
-			else if (gMouse->IsPress(MOUSE_LBUTTON))
-			{
-				//gridBuffer->Data.SelectGridStart = gridBuffer->Data.HoverGrid;
-
-				D3DXVECTOR2 size = Math::Abs(gridBuffer->Data.HoverGridStart - clickedGrid);
-				size += D3DXVECTOR2(1, 1) * (float)gridBuffer->Data.GridSpacing;
-
-				gridBuffer->Data.SelectGridSize = size;
-
-				if (clickedGrid.x >= gridBuffer->Data.HoverGridStart.x)
-				{
-					gridBuffer->Data.SelectGridStart.x = gridBuffer->Data.HoverGridStart.x;
-				}
-				if (clickedGrid.y >= gridBuffer->Data.HoverGridStart.y)
-				{
-					gridBuffer->Data.SelectGridStart.y = gridBuffer->Data.HoverGridStart.y;
-				}
-			}
-
 			switch (editmode)
 			{
+				case EDITMODE_ALPHATEXTURE:
 				case EDITMODE_HEIGHTUPDOWN:
 				case EDITMODE_HEIGHTSMOOTH:
-				case EDITMODE_ALPHATEXTURE:
 				case EDITMODE_MAKETREE:
+				case EDITMODE_ENEMYAREA:
 				{
+					//Grid Select
 					if (gMouse->IsDown(MOUSE_LBUTTON))
 					{
 						clickedGrid = gridBuffer->Data.HoverGridStart;
@@ -559,6 +605,45 @@ void Landscape::Terrain::UpdateKeyboard(void)
 
 			switch (editmode)
 			{
+				case EDITMODE_ALPHATEXTURE:
+				{
+					//키보드 UP, DOWN 으로 Height 수정
+					if (gKeyboard->IsPress(VK_UP))
+					{
+						if (!bChangeTerrain)
+						{
+							bChangeTerrain = true;
+							terrainData->CopyVertexDataTo(&vertexDataOld);
+						}
+
+						terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.SelectGridStart, gridBuffer->Data.SelectGridSize, intensity);
+					}
+					else if (gKeyboard->IsPress(VK_DOWN))
+					{
+						if (!bChangeTerrain)
+						{
+							bChangeTerrain = true;
+							terrainData->CopyVertexDataTo(&vertexDataOld);
+						}
+
+						terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.SelectGridStart, gridBuffer->Data.SelectGridSize, -intensity);
+					}
+					else
+					{
+						if (bChangeTerrain)
+						{
+							VertexTypePTNC2* vertexDataNew = NULL;
+							terrainData->CopyVertexDataTo(&vertexDataNew);
+
+							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
+							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
+
+							vertexDataOld = NULL;
+							bChangeTerrain = false;
+						}
+					}
+				}
+				break;
 				case EDITMODE_HEIGHTUPDOWN:
 				{
 					//키보드 UP, DOWN 으로 Height 수정
@@ -599,46 +684,7 @@ void Landscape::Terrain::UpdateKeyboard(void)
 				}
 				break;
 				case EDITMODE_HEIGHTSMOOTH:
-				break;
-				case EDITMODE_ALPHATEXTURE:
-				{
-					//키보드 UP, DOWN 으로 Height 수정
-					if (gKeyboard->IsPress(VK_UP))
-					{
-						if (!bChangeTerrain)
-						{
-							bChangeTerrain = true;
-							terrainData->CopyVertexDataTo(&vertexDataOld);
-						}
-
-						terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.SelectGridStart, gridBuffer->Data.SelectGridSize, intensity);
-					}
-					else if (gKeyboard->IsPress(VK_DOWN))
-					{
-						if (!bChangeTerrain)
-						{
-							bChangeTerrain = true;
-							terrainData->CopyVertexDataTo(&vertexDataOld);
-						}
-
-						terrainData->AdjustVertexAlpha(selectTexture, gridBuffer->Data.SelectGridStart, gridBuffer->Data.SelectGridSize, -intensity);
-					}
-					else
-					{
-						if (bChangeTerrain)
-						{
-							VertexTypePTNC2* vertexDataNew = NULL;
-							terrainData->CopyVertexDataTo(&vertexDataNew);
-
-							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
-							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
-
-							vertexDataOld = NULL;
-							bChangeTerrain = false;
-						}
-					}
-				}
-				break;
+					break;
 				case EDITMODE_MAKETREE:
 				{
 #if USE_TREE
@@ -651,6 +697,18 @@ void Landscape::Terrain::UpdateKeyboard(void)
 						DeleteTrees(gridBuffer->Data.SelectGridStart, gridBuffer->Data.SelectGridSize);
 					}
 #endif
+				}
+				break;
+				case EDITMODE_ENEMYAREA:
+				{
+					if (gKeyboard->IsDown(VK_RETURN))
+					{
+						if (enemyAreas.size() > 0 && showAreaIndex < enemyAreas.size())
+						{
+							enemyAreas[showAreaIndex].Start = gridBuffer->Data.SelectGridStart;
+							enemyAreas[showAreaIndex].Size = gridBuffer->Data.SelectGridSize;
+						}
+					}
 				}
 				break;
 				case EDITMODE_ASTARTEST:
@@ -679,43 +737,63 @@ void Landscape::Terrain::PostRenderEditMenu(void)
 {
 	switch (editmode)
 	{
+		case EDITMODE_ALPHATEXTURE:	ImGui::Text("EDITMODE_ALPHATEXTURE");	break;
 		case EDITMODE_HEIGHTUPDOWN:	ImGui::Text("EDITMODE_HEIGHTUPDOWN");	break;
 		case EDITMODE_HEIGHTSMOOTH:	ImGui::Text("EDITMODE_HEIGHTSMOOTH");	break;
-		case EDITMODE_ALPHATEXTURE:	ImGui::Text("EDITMODE_ALPHATEXTURE");	break;
 		case EDITMODE_MAKETREE:		ImGui::Text("EDITMODE_MAKETREE");		break;
+		case EDITMODE_ENEMYAREA:	ImGui::Text("EDITMODE_ENEMYAREA");		break;
 		case EDITMODE_ASTARTEST:	ImGui::Text("EDITMODE_ASTARTEST");		break;
 	}
-	ImGui::SliderInt("Edit Mode", (int*)&editmode, EDITMODE_HEIGHTUPDOWN, EDITMODE_MAX - 1);
+	ImGui::SliderInt("Edit Mode", (int*)&editmode, EDITMODE_ALPHATEXTURE, EDITMODE_MAX - 1);
 
-	//Height Map
+	if (editmode == EDITMODE_ALPHATEXTURE)
 	{
-		ImGui::Text("Height Map");
-		ImGui::SameLine();
-		if (ImGui::Button("Clear Height"))
-		{
-			terrainData->ClearVertexHeight();
-		}
+		PostRenderTextures();
+	}
+	else if (editmode == EDITMODE_HEIGHTUPDOWN
+			|| editmode == EDITMODE_HEIGHTSMOOTH)
+	{
+		PostRenderHeightMap();
+	}
+	else if (editmode == EDITMODE_ENEMYAREA)
+	{
+		PostRenderEnemyArea();
+	}
+}
 
-		if (ImGui::Button("Load Height"))//, ImVec2(30, 30)))
-		{
-			D3DDesc desc;
-			D3D::GetDesc(&desc);
-			function<void(wstring)> func = bind(&Landscape::TerrainData::SetHeightMapFile, terrainData, placeholders::_1, 10.0f);
-			Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
-
-			//선택한것 해제
-
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Save Height"))//, ImVec2(30, 30)))
-		{
-			D3DDesc desc;
-			D3D::GetDesc(&desc);
-			function<void(wstring)> func = bind(&Landscape::TerrainData::SaveHeightMap, terrainData, placeholders::_1);
-			Path::SaveFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
-		}
+void Landscape::Terrain::PostRenderHeightMap(void)
+{
+	ImGui::Text("Height Map");
+	ImGui::SameLine();
+	if (ImGui::Button("Clear Height"))
+	{
+		terrainData->ClearVertexHeight();
 	}
 
+#if 0 //잠깐 주석
+	if (ImGui::Button("Load Height"))//, ImVec2(30, 30)))
+	{
+		D3DDesc desc;
+		D3D::GetDesc(&desc);
+		function<void(wstring)> func = bind(&Landscape::TerrainData::SetHeightMapFile, terrainData, placeholders::_1, 10.0f);
+		Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
+	
+		//선택한것 해제
+	
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Save Height"))//, ImVec2(30, 30)))
+	{
+		D3DDesc desc;
+		D3D::GetDesc(&desc);
+		function<void(wstring)> func = bind(&Landscape::TerrainData::SaveHeightMap, terrainData, placeholders::_1);
+		Path::SaveFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
+	}
+#endif
+}
+
+void Landscape::Terrain::PostRenderTextures(void)
+{
 	//Diffuse Map
 	{
 		ImGui::Text("Diffuse Map");
@@ -745,6 +823,7 @@ void Landscape::Terrain::PostRenderEditMenu(void)
 			char num[10];
 			sprintf(num, "%d", i + 1);
 
+#if 0
 			string str = string("Load Alpha Map") + string(num);
 			if (ImGui::Button(str.c_str()))
 			{
@@ -762,6 +841,7 @@ void Landscape::Terrain::PostRenderEditMenu(void)
 				function<void(wstring)> func = bind(&Landscape::TerrainData::SaveAlphaMap, terrainData, i, placeholders::_1);
 				Path::SaveFileDialog(L"", Path::ImageFilter, Textures, func, desc.Handle);
 			}
+#endif
 		}
 	}
 
@@ -772,9 +852,9 @@ void Landscape::Terrain::PostRenderEditMenu(void)
 		{
 			bool bSelect = (selectTexture & (1 << i)) == (1 << i);
 			char num[10];
-			sprintf(num, "%d", i+1);
+			sprintf(num, "%d", i + 1);
 
-			if (editmode == EDITMODE_ALPHATEXTURE)
+			//if (editmode == EDITMODE_ALPHATEXTURE)
 			{
 				if (ImGui::Checkbox(num, &bSelect))
 				{
@@ -812,6 +892,53 @@ void Landscape::Terrain::PostRenderEditMenu(void)
 					ChangeTexture(i, L"");
 				}
 			}
+		}
+	}
+}
+
+void Landscape::Terrain::PostRenderEnemyArea(void)
+{
+	size_t count = enemyAreas.size();
+	string list;
+	for (size_t i = 0; i < count; i++)
+	{
+		list += enemyAreas[i].Name.c_str();
+		list.push_back('\0');
+	}
+	ImGui::Combo("Areas", &showAreaIndex, list.c_str());
+
+	if (count > 0)
+	{
+		char name[128] = "";
+		strcpy_s(name, 128, enemyAreas[showAreaIndex].Name.c_str());
+		if (ImGui::InputText("Name", name, 128))
+		{
+			enemyAreas[showAreaIndex].Name = name;
+		}
+		ImGui::DragFloat2("Start XZ", enemyAreas[showAreaIndex].Start);
+		ImGui::DragFloat2("Size XZ", enemyAreas[showAreaIndex].Size);
+		ImGui::ColorEdit3("Color", enemyAreas[showAreaIndex].Color);
+		ImGui::Checkbox("Show", &enemyAreas[showAreaIndex].Show);
+	}
+
+	if (ImGui::Button("Add Area"))
+	{
+		if (enemyAreas.size() < ENEMYAREA_MAX)
+		{
+			EnemyArea area;
+			area.Start = gridBuffer->Data.SelectGridStart;
+			area.Size = gridBuffer->Data.SelectGridSize;
+			enemyAreas.push_back(area);
+			showAreaIndex = enemyAreas.size() - 1;
+		}
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Delete"))
+	{
+		enemyAreas.erase(enemyAreas.begin() + showAreaIndex);
+		if (showAreaIndex >= enemyAreas.size())
+		{
+			showAreaIndex = 0;
 		}
 	}
 }

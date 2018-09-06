@@ -3,8 +3,6 @@
 #include "GamePlayer.h"
 #include "../Landscape/Terrain.h"
 
-class EnemyTank;
-
 class PlayerBullet;
 
 namespace Landscape { class Terrain; }
@@ -34,7 +32,6 @@ private:
 
 	static GamePlayer* player;
 	static Landscape::Terrain* terrain;
-	EnemyTank* tank;
 
 	vector<GameModel*> staticModels;
 	vector<PlayerBullet*> bullets;

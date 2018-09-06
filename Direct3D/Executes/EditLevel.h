@@ -1,6 +1,8 @@
 #pragma once
 
 class GameModel;
+class BoundingSphere;
+class BoundingBox;
 
 #include "../Landscape/Terrain.h"
 #include "../Environment/Sky.h"
@@ -23,6 +25,9 @@ private:
 	void LoadJsonFile(void);
 	void SaveJsonFile(void);
 
+	void EditPlayerStart(void);
+	void LoadData(void);
+	void SaveData(void);
 
 private:
 	wstring levelFile;
@@ -34,6 +39,6 @@ private:
 	Environment::Sky* sky;
 
 	vector<GameModel*> staticModels;
-
-
+	
+	BoundingSphere*			playerStart;
 };

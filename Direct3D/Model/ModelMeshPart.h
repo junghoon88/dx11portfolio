@@ -22,7 +22,7 @@ private:
 	void Render(void);
 
 	void ScanPointMinMax(D3DXVECTOR3 * min, D3DXVECTOR3 * max, D3DXMATRIX& matWorld);
-
+	bool MousePickked(D3DXMATRIX& matParent, D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float& dist);
 
 private:
 	ModelMesh*				parent;

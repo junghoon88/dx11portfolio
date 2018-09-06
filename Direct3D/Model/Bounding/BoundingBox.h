@@ -4,8 +4,6 @@
 class BoundingBox : public Bounding
 {
 public:
-
-	//
 	BoundingBox(GameModel* mymodel, D3DXVECTOR3 min, D3DXVECTOR3 max);
 	~BoundingBox();
 
@@ -18,6 +16,9 @@ public:
 
 	inline D3DXVECTOR3 GetOrgMin(void) const { return Min; }
 	inline D3DXVECTOR3 GetOrgMax(void) const { return Max; }
+
+	inline D3DXVECTOR3& GetOrgMinRef(void) { return Min; }
+	inline D3DXVECTOR3& GetOrgMaxRef(void) { return Max; }
 
 	inline void SetMin(D3DXVECTOR3 vec) { Min = vec; }
 	inline void SetMax(D3DXVECTOR3 vec) { Max = vec; }

@@ -3,7 +3,7 @@
 
 AiContext::AiContext()
 	: bActive(true), bEnable(true)
-	, active(NULL), next(NULL)
+	, current(NULL), next(NULL)
 {
 }
 
@@ -17,14 +17,16 @@ void AiContext::Update(void)
 		return;
 	if (bEnable == false)
 		return;
-	if (active == NULL && next == NULL)
+	if (current == NULL && next == NULL)
 		return;
 
-	if (active == NULL)
+	if (current == NULL)
 	{
 		Play(next, next->ActiveTime);
+
+		next = NULL;
 	}
-	else if (next != NULL && active->IsActive() == false)//next->ActiveTime == 0.0f)
+	else if (next != NULL && current->IsActive() == false)
 	{
 		Play(next, next->ActiveTime);
 
@@ -32,13 +34,13 @@ void AiContext::Update(void)
 	}
 	else
 	{
-		active->Update();
-		if (active->IsActive())
+		current->Update();
+		if (current->IsActive())
 		{
-			active->ActiveTime -= Time::Delta();
+			current->ActiveTime -= Time::Delta();
 
-			if (active->ActiveTime < 0.0f)
-				active->ActiveTime = 0.0f;
+			if (current->ActiveTime < 0.0f)
+				current->ActiveTime = 0.0f;
 		}
 	}
 }
@@ -87,7 +89,7 @@ void AiContext::StartState(UINT index, float activeTime)
 {
 	bActive = true;
 
-	active = NULL;
+	current = NULL;
 	next = NULL;
 
 	Play(index, activeTime);
@@ -106,12 +108,10 @@ void AiContext::Play(AiState* state, float activeTime)
 	if (bActive == false)
 		return;
 	
-	if (active != NULL)
-		active->Finish();
+	if (current != NULL)
+		current->Finish();
 
-	active = state;
-	active->ActiveTime = activeTime;
-	
-
-	active->Start();
+	current = state;
+	current->ActiveTime = activeTime;
+	current->Start();
 }

@@ -56,14 +56,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./;../_Libraries</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../_Libraries/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../_Libraries</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../_Libraries/</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -90,19 +90,20 @@
     <ClCompile Include="Command\Command.cpp" />
     <ClCompile Include="Environment\SkyPlane.cpp" />
     <ClCompile Include="Environment\Sky.cpp" />
-    <ClCompile Include="Executes\DrawModel.cpp" />
+    <ClCompile Include="Executes\DrawStage.cpp" />
     <ClCompile Include="Executes\EditLevel.cpp" />
     <ClCompile Include="Executes\EditModel.cpp" />
     <ClCompile Include="Executes\ExeGui.cpp" />
     <ClCompile Include="Fbx\Exporter.cpp" />
     <ClCompile Include="Fbx\Utility.cpp" />
     <ClCompile Include="Fbx\XmlToAnim.cpp" />
-    <ClCompile Include="Gizmo\Geometry.cpp" />
-    <ClCompile Include="Landscape\GameTerrain.cpp" />
+    <ClCompile Include="GamePlayManager\EnemyRespawnManager.cpp" />
+    <ClCompile Include="GamePlayManager\GamePlayManager.cpp" />
     <ClCompile Include="Landscape\Grid3Axis.cpp" />
     <ClCompile Include="Landscape\Ocean.cpp" />
     <ClCompile Include="Landscape\Terrain.cpp" />
     <ClCompile Include="Landscape\TerrainData.cpp" />
+    <ClCompile Include="Landscape\TerrainQuadTree.cpp" />
     <ClCompile Include="Lights\Fog.cpp" />
     <ClCompile Include="Lights\LightManager.cpp" />
     <ClCompile Include="Lights\PointLight.cpp" />
@@ -125,6 +126,7 @@
     <ClCompile Include="Model\ModelReader.cpp" />
     <ClCompile Include="Objects\GameModel.cpp" />
     <ClCompile Include="Objects\GameRender.cpp" />
+    <ClCompile Include="Objects\GModelReadWrite.cpp" />
     <ClCompile Include="Objects\MeshCapsule.cpp" />
     <ClCompile Include="Objects\MeshCube.cpp" />
     <ClCompile Include="Program.cpp" />
@@ -142,13 +144,11 @@
     <ClCompile Include="Systems\Time.cpp" />
     <ClCompile Include="Systems\Window.cpp" />
     <ClCompile Include="Units\AiContext.cpp" />
-    <ClCompile Include="Units\EnemyTank.cpp" />
     <ClCompile Include="Units\GameEnemy.cpp" />
+    <ClCompile Include="Units\GameEnemyRobot.cpp" />
     <ClCompile Include="Units\GamePlayer.cpp" />
     <ClCompile Include="Units\GameSettings.cpp" />
     <ClCompile Include="Units\GameUnit.cpp" />
-    <ClCompile Include="Units\GameWeapon.cpp" />
-    <ClCompile Include="Units\PlayerBullet.cpp" />
     <ClCompile Include="Utilities\BinaryFile.cpp" />
     <ClCompile Include="Utilities\JsonManager.cpp" />
     <ClCompile Include="Utilities\Math.cpp" />
@@ -161,7 +161,9 @@
     </ClCompile>
     <ClCompile Include="Viewer\Camera.cpp" />
     <ClCompile Include="Viewer\FixedCamera.cpp" />
+    <ClCompile Include="Viewer\FollowCamera.cpp" />
     <ClCompile Include="Viewer\Free.cpp" />
+    <ClCompile Include="Viewer\FrustumCulling.cpp" />
     <ClCompile Include="Viewer\Orthographic.cpp" />
     <ClCompile Include="Viewer\Perspective.cpp" />
     <ClCompile Include="Viewer\Viewport.cpp" />
@@ -172,7 +174,7 @@
     <ClInclude Include="Command\CommandTerrain.h" />
     <ClInclude Include="Environment\Sky.h" />
     <ClInclude Include="Environment\SkyPlane.h" />
-    <ClInclude Include="Executes\DrawModel.h" />
+    <ClInclude Include="Executes\DrawStage.h" />
     <ClInclude Include="Executes\EditLevel.h" />
     <ClInclude Include="Executes\EditModel.h" />
     <ClInclude Include="Executes\Execute.h" />
@@ -183,13 +185,14 @@
     <ClInclude Include="Fbx\Type.h" />
     <ClInclude Include="Fbx\Utility.h" />
     <ClInclude Include="Fbx\XmlToAnim.h" />
-    <ClInclude Include="Gizmo\Geometry.h" />
+    <ClInclude Include="GamePlayManager\EnemyRespawnManager.h" />
+    <ClInclude Include="GamePlayManager\GamePlayManager.h" />
     <ClInclude Include="Interfaces\ICloneable.h" />
-    <ClInclude Include="Landscape\GameTerrain.h" />
     <ClInclude Include="Landscape\Grid3Axis.h" />
     <ClInclude Include="Landscape\Ocean.h" />
     <ClInclude Include="Landscape\Terrain.h" />
     <ClInclude Include="Landscape\TerrainData.h" />
+    <ClInclude Include="Landscape\TerrainQuadTree.h" />
     <ClInclude Include="Lights\Fog.h" />
     <ClInclude Include="Lights\LightManager.h" />
     <ClInclude Include="Lights\PointLight.h" />
@@ -215,6 +218,7 @@
     <ClInclude Include="Objects\AnimationKeyframe.h" />
     <ClInclude Include="Objects\GameModel.h" />
     <ClInclude Include="Objects\GameRender.h" />
+    <ClInclude Include="Objects\GModelReadWrite.h" />
     <ClInclude Include="Objects\MeshCapsule.h" />
     <ClInclude Include="Objects\MeshCube.h" />
     <ClInclude Include="Program.h" />
@@ -235,15 +239,13 @@
     <ClInclude Include="Units\AiContext.h" />
     <ClInclude Include="Units\AiState.h" />
     <ClInclude Include="Units\EnemyMoveRoute.h" />
-    <ClInclude Include="Units\EnemyTank.h" />
     <ClInclude Include="Units\GameData.h" />
     <ClInclude Include="Units\GameEnemy.h" />
+    <ClInclude Include="Units\GameEnemyRobot.h" />
     <ClInclude Include="Units\GamePlayer.h" />
     <ClInclude Include="Units\GamePlayerInput.h" />
     <ClInclude Include="Units\GameSettings.h" />
     <ClInclude Include="Units\GameUnit.h" />
-    <ClInclude Include="Units\GameWeapon.h" />
-    <ClInclude Include="Units\PlayerBullet.h" />
     <ClInclude Include="Utilities\BinaryFile.h" />
     <ClInclude Include="Utilities\JsonManager.h" />
     <ClInclude Include="Utilities\Math.h" />
@@ -254,7 +256,9 @@
     <ClInclude Include="Utilities\Xml.h" />
     <ClInclude Include="Viewer\Camera.h" />
     <ClInclude Include="Viewer\FixedCamera.h" />
+    <ClInclude Include="Viewer\FollowCamera.h" />
     <ClInclude Include="Viewer\Free.h" />
+    <ClInclude Include="Viewer\FrustumCulling.h" />
     <ClInclude Include="Viewer\Orthographic.h" />
     <ClInclude Include="Viewer\Perspective.h" />
     <ClInclude Include="Viewer\Viewport.h" />

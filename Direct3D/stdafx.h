@@ -114,6 +114,9 @@ extern wstring  gWstringParentDirectory;
 #include "./Utilities/String.h"
 #include "./Utilities/Path.h"
 
+#include "./Viewer/FrustumCulling.h"
+
+
 #include "./Model/Component.h"
 #include "./Model/Model.h"
 #include "./Model/ModelBone.h"

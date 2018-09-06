@@ -35,7 +35,7 @@ void Landscape::TerrainData::SetHeightMapFile(wstring file, float heightRatio)
 
 	FillVertexData(heightRatio);
 	FillNormalData();
-	FillSellData();
+	//FillSellData();
 
 	CreateBuffer();
 
@@ -180,7 +180,6 @@ void Landscape::TerrainData::FillVertexData(float heightRatio)
 
 			index++;
 		}//for(x)
-
 	}//for(y)	
 
 

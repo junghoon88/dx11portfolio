@@ -23,6 +23,7 @@ public:
 	void Render(void);
 
 	void ScanPointMinMax(D3DXVECTOR3 * min, D3DXVECTOR3 * max);
+	bool MousePickked(D3DXMATRIX& matParent, D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float & dist);
 
 public:
 	inline wstring GetName(void)			{ return name; }

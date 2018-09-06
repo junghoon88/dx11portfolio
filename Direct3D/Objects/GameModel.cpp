@@ -9,8 +9,9 @@ GameModel::GameModel(wstring file, ANIMATION_TYPE animType)
 	, velocity(0, 0, 0)
 	, shader(NULL)
 	, bPause(false)
+	, isPlayEnd(false)
 {
-	matFile = file + L".material";
+	matFile  = file + L".material";
 	meshFile = file + L".mesh";
 
 	model = new Model();
@@ -76,10 +77,13 @@ void GameModel::Update(void)
 			
 			if (clips.size() > 0)
 			{
+				isPlayEnd = false;
+
 				UINT boneCount = model->GetBoneCount();
 				for (UINT i = 0; i < boneCount; i++)
 				{
 					AnimationBlender* blender = blenders[i];
+
 
 					if (blender->Exist())
 					{
@@ -89,7 +93,16 @@ void GameModel::Update(void)
 
 						D3DXMATRIX mat = blender->GetKeyframeMatrix(time);
 
+						//기본축 X, Z 는 움직이지 않도록 
+						if (i == 0)
+						{
+							mat._41 = 0;
+							mat._43 = 0;
+						}
+
 						model->GetBone(i)->SetTransform(mat);
+
+						isPlayEnd |= blender->Current->IsPlayDone();
 					}
 				}
 			}
@@ -129,7 +142,7 @@ void GameModel::Render(void)
 
 	assert(boneTransforms.size() > 0);
 
-	boneBuffer->SetBones(&boneTransforms[0], boneTransforms.size());
+	boneBuffer->SetBones(boneTransforms);
 	boneBuffer->SetVSBuffer(2);
 
 	for (ModelMesh* mesh : model->GetMeshesRef())
@@ -140,16 +153,6 @@ void GameModel::Render(void)
 
 		mesh->Render();
 	}
-
-
-	//TODO : Bone 없을 때 테스트
-	//else
-	//{
-	//	for (ModelMesh* mesh : model->GetMeshesRef())
-	//	{
-	//		mesh->Render();
-	//	}
-	//}
 }
 
 D3DXVECTOR3 GameModel::CalcVelocity(D3DXVECTOR3& vel)
@@ -229,6 +232,19 @@ void GameModel::CalcPosition(void)
 	}
 }
 
+void GameModel::SetShader(wstring shaderFile)
+{
+	if (shaderFile.length() == 0)
+		return;
+
+	SAFE_DELETE(shader);
+	shader = new Shader(shaderFile);
+	for (Material* material : model->GetMaterials())
+	{
+		material->SetShader(shader);
+	}
+}
+
 UINT GameModel::AddClipAll(wstring path)
 {
 	vector<wstring> files;
@@ -253,6 +269,20 @@ UINT GameModel::AddClip(AnimationClip* clip)
 	clips.push_back(clip);
 
 	return (clips.size() - 1);
+}
+
+UINT GameModel::FindClip(wstring name)
+{
+	size_t size = clips.size();
+	for (size_t i = 0; i < size; i++)
+	{
+		wstring filename = Path::GetFileNameWithoutExtension(clips[i]->fileName);
+		if (filename == name)
+		{
+			return i;
+		}
+	}
+	return UINT(-1);
 }
 
 void GameModel::RemoveClip(UINT index)
@@ -306,10 +336,11 @@ bool GameModel::PlayAnim(UINT index, float startTime, float blendTime, float tim
 		if (blender == NULL)
 			continue;
 
-		blender->AddKeyframe(keyframe, startTime, blendTime, timeScaleFactor, mode);
+		wstring clipName = Path::GetFileNameWithoutExtension(clip->fileName);
+		blender->AddKeyframe(clipName, keyframe, startTime, blendTime, timeScaleFactor, mode);
 	}
 
-	return false;
+	return true;
 }
 
 void GameModel::PauseAnim(bool pause)
@@ -355,6 +386,38 @@ float GameModel::GetPlayProgress(void)
 		}
 	}
 	return 0.0f;
+}
+
+bool GameModel::MousePickked(D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float & dist)
+{
+	for (ModelMesh* mesh : model->GetMeshesRef())
+	{
+		int parent = mesh->GetParentBoneIndex();
+
+		D3DXMATRIX matParent;
+		D3DXMatrixIdentity(&matParent);
+		if(parent >= 0)
+			matParent = boneTransforms[parent]; // skintransform 으로 해야하나?
+		
+		if (mesh->MousePickked(matParent, start, direction, dist))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+Bounding* GameModel::GetBounding(string name)
+{
+	for (size_t i = 0; i < boundings.size(); i++)
+	{
+		if (boundings[i]->GetName() == name)
+		{
+			return boundings[i];
+		}
+	}
+
+	return nullptr;
 }
 
 

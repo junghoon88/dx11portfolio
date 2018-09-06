@@ -39,6 +39,7 @@ public:
 	{
 		D3DXMatrixIdentity(&Data.View);
 		D3DXMatrixIdentity(&Data.Projection);
+		D3DXMatrixInverse(&Data.ViewInverse, NULL, &Data.View);
 	}
 
 	void SetView(D3DXMATRIX& mat)

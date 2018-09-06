@@ -5,16 +5,18 @@ struct AnimationBinder
 {
 	AnimationPlayMode PlayMode = AnimationPlayMode::Once;
 
+	wstring clipName = L"";
 	float Speed = 0.0f;
 	float PlayTime = 0.0f;
 
 	AnimationKeyframe* Keyframe;
 
 	float GetDuration() { return Keyframe->Duration; }
-	bool IsPlayDone() { return (PlayTime >= Keyframe->Duration); }
+	bool IsPlayDone() { return (PlayMode == AnimationPlayMode::Once) && (PlayTime >= Keyframe->Duration); }
 
-	void BindKeyframe(AnimationKeyframe* keyframe, float start, float speed, AnimationPlayMode mode)
+	void BindKeyframe(wstring clipName, AnimationKeyframe* keyframe, float start, float speed, AnimationPlayMode mode)
 	{
+		this->clipName = clipName;
 		Keyframe = keyframe;
 
 		PlayTime = start;
@@ -24,6 +26,7 @@ struct AnimationBinder
 
 	void Initialize()
 	{
+		clipName = L"";
 		Keyframe = NULL;
 
 		PlayTime = 0.0f;
@@ -33,6 +36,7 @@ struct AnimationBinder
 
 	void CopyTo(AnimationBinder* clone)
 	{
+		clone->clipName = this->clipName;
 		clone->Keyframe = this->Keyframe;
 		clone->PlayTime = this->PlayTime;
 		clone->Speed = this->Speed;

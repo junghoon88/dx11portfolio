@@ -1,25 +1,20 @@
 #pragma once
 #include "Bounding.h"
 
-class BoundingSphere;
-class BoundingCylinder;
-
-class GameModel;
-
 class BoundingCapsule : public Bounding
 {
 public:
 	BoundingCapsule(GameModel* mymodel, D3DXVECTOR3 center, float radius, float height);
 	~BoundingCapsule();
 
-	void Update(void);
-	void PostRender(void);
+	virtual void Update(void) override;
+	virtual void PostRender(void) override;
+	virtual void GetCorners(vector<D3DXVECTOR3>& vec) override;
 
 	void SetCenter(D3DXVECTOR3 vec);
 	void SetRadius(float r);
 	void SetHeight(float h);
 
-	void GetCorners(vector<D3DXVECTOR3>& vec);
 	void CalcVertices(void);
 
 private:

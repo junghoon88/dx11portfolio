@@ -3,17 +3,16 @@
 
 #include "../../Units/GameUnit.h"
 
-BoundingSphere::BoundingSphere()
-	: Center(0, 0, 0), Radius(0.5f)
+BoundingSphere::BoundingSphere(GameModel* mymodel)
+	: Bounding(mymodel)
+	, Center(0, 0, 0), Radius(0.5f)
 	, sphereResolution(30)
-	, myUnit(NULL)
-	, socketNum(-1)
 {
 	assert(Radius > 0.0f);
 
+	type = BoundingType::Sphere;
+
 	InitVertices();
-	D3DXMatrixIdentity(&socketTransform);
-	D3DXMatrixIdentity(&myWorld);
 }
 
 BoundingSphere::~BoundingSphere()
@@ -22,27 +21,17 @@ BoundingSphere::~BoundingSphere()
 
 void BoundingSphere::Update(void)
 {
-	D3DXMATRIX S, R, T;
-	D3DXMatrixScaling(&S, transform.Scale.x, transform.Scale.y, transform.Scale.z);
+	Bounding::Update();
 
-	D3DXVECTOR3 rot = Math::ToRadian(transform.RotationDeg);
-	D3DXMatrixRotationYawPitchRoll(&R, rot.y, rot.x, rot.z);
-	D3DXMatrixTranslation(&T, transform.Position.x, transform.Position.y, transform.Position.z);
-
-	myWorld = S * R * T;
-	if (socketNum != -1)
+	if (bShow)
 	{
-		D3DXMATRIX unitWorld = myUnit->Transformed();
-		//myUnit->GetWorld(unitWorld);
-		D3DXMATRIX socketTransform = myUnit->GetModel()->GetBone(socketNum)->GetTransform();
-
-		myWorld = myWorld * socketTransform * unitWorld;
+		gModelShape->AddBoundingSphere(this, color);
 	}
 }
 
 void BoundingSphere::PostRender(void)
 {
-
+	Bounding::PostRender();
 }
 
 void BoundingSphere::GetCorners(vector<D3DXVECTOR3>& vec)

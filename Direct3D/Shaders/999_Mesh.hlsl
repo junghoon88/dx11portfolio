@@ -24,8 +24,15 @@ PixelInput VS(VertexTextureNormal input)
 
 float4 PS(PixelInput input) : SV_TARGET
 {
-    float4 color = _diffuseMap.Sample(_diffuseSampler, input.uv);
+    float4 color = 0;
+
+    float4 diffuseColor = _diffuseMap.Sample(_diffuseSampler, input.uv);
+    if (length(diffuseColor) <= 0.0f)
+        diffuseColor = _diffuse;
+
+    Diffuse(color.rgb, diffuseColor.rgb, input.normal);
+
+    color.a = 1;
 
     return color;
-    return GetDiffuseColor(color, _direction, input.normal);
 }

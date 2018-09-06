@@ -3,94 +3,55 @@
 
 struct GamePlayerSpec;
 struct GamePlayerInput;
-class BoundingBox;
-class DrawModel;
 
 class GamePlayer : public GameUnit
 {
 public:
 	enum class DebugMode;
 private:
-	enum class LowerAction;
-	enum class UpperAction;
+	enum class PlayerAction;
 
 public:
-	GamePlayer(wstring path);
+	GamePlayer(wstring path, ANIMATION_TYPE animType = ANIMATION_TYPE::Mixamo);
 	~GamePlayer();
 
+	void Init(void);
 	void Update(void);
 	void Render(void);
 	void PostRender(void);
 
 private:
-	void LoadAnimation(wstring path);
+	void LinkAnimation(void);
 
 	void HandleInput(void);
 	void HandleMove(void);
 	void HandleRotation(void);
 	void HandleAttack(void);
 
-	void PlayLowerAction(LowerAction action);
-	void PlayLowerAction(LowerAction action, float startTime);
-	void PlayUpperAction(UpperAction action);
-	void PlayUpperAction(UpperAction action, float startTime);
+	void SetPlayerIdle(void);
+	void PlayAction(PlayerAction action);
+	void PlayAction(PlayerAction action, float startTime);
 
-	void ActionMovement(D3DXVECTOR3 direction);
-	void ActionRotation(void);
+	void ActionMovement(D3DXVECTOR3 direction, OUT D3DXVECTOR3& velocity);
 
 public:
-	void LinkAdress(DrawModel* p) { drawModel = p; }
 	inline DebugMode GetDebugMode(void) { return debugMode; }
 
 private:
 	GamePlayerSpec* specData;
 	GamePlayerInput* input;
 
-	ModelBone* boneWaist;
-	D3DXMATRIX boneWaistSrc;
-
 	D3DXVECTOR3 moveDirection;
-
-	float runDurationTime;
-	float walkDurationTime;
-	float boosterFinishDurationTim;
-	float boosterBreakDurationTime;
-	float weaponChangeDurationTime;
-
-	bool bActiveBooster;
-	bool bRun;
-
-	float rootRotationAngle;
-	float rootElapsedAngle;
-	float curWaistAngle;
-
-	bool bOverwriteLowerAction = false; // 동작이 바뀌는지 여부
-	bool bOverwriteUpperAction = false; // 동작이 바뀌는지 여부
-	float actionElapsedTime;
-	float moveElapsedTime;
-
-	//attack
-	float attackDelay;
-	float attackTime;
-	int   attackNum;
-
-	//box
-	BoundingBox* box;
-
-	//DrawModel
-	DrawModel* drawModel;
 
 private:
 	DebugMode debugMode;
 
-	LowerAction curLowerAction;
-	UpperAction curUpperAction;
+	PlayerAction curAction;
+	PlayerAction nextAction;
 
-	LowerAction prepareLowerAction;
-	UpperAction prepareUpperAction;
-
-	vector<UINT> indexLowerAnimations;
-	vector<UINT> indexUpperAnimations;
+	vector<UINT> indexAnimations;
+	bool bRun;
+	float attackTime;
 
 public:
 	enum class DebugMode
@@ -98,27 +59,14 @@ public:
 		None = 0, NeverDie, Superman, God, 
 	};
 private:
-	enum class LowerAction
+	enum class PlayerAction
 	{
-		Unknown = 0,
-		Idle, Run, Damage, Walk, BackWalk, LeftTurn, RightTurn,
-		ForwardDead, BackwardDead, LeftDead, RightDead,
-		BoosterPrepare, BoosterActive, BoosterFinish, BoosterBreak,
-		BoosterLeftTurn, BoosterRightTurn,
+		Idle, 
+		Walk_Forward, Walk_Backward, Strafe_Left, Strafe_Right, Run,
+		Slash, Slash_3combo, Kick, Charge_Attack, High_Spin_Attack,
+		Power_Up,
+		Spell_Cast,
+		Death1, Death2,
 		Count,
 	};
-	enum class UpperAction
-	{
-		Unknown = 0,
-		Idle, Run, Damage, WeaponChange,
-		ForwardNonFire, LeftNonFire, RightNonFire,
-		ForwardMachineGunFire, LeftMachineGunFire, RightMachineGunFire, ReloadMachineGun,
-		ForwardShotgunFire, LeftShotgunFire, RightShotgunFire, ReloadShotgun,
-		ForwardHandgunFire, LeftHandgunFire, RightHandgunFire, ReloadHandgun,
-		ForwardDead, BackwardDead, LeftDead, RightDead,
-		BoosterPrepare, BoosterActive, BoosterFinish, BoosterBreak,
-		BoosterLeftTurn, BoosterRightTurn,
-		Count,
-	};
-
 };

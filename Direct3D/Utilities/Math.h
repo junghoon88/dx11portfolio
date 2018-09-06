@@ -32,8 +32,7 @@ public:
 	static float ToRadian(float degree);
 	static D3DXVECTOR3 ToRadian(D3DXVECTOR3 vec);
 	static float ToDegree(float radian);
-
-	static int RandomRange(int r1, int r2);
+	static D3DXVECTOR3 ToDegree(D3DXVECTOR3 vec);
 
 	static float WrapAngle(float angle, bool isDegree);
 	static float WrapAngleDeg(float angle);

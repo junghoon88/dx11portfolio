@@ -35,7 +35,7 @@ void BoundingCapsule::PostRender(void)
 {
 	Bounding::PostRender();
 
-	ImGui::InputFloat3("Center", center);
+	ImGui::DragFloat3("Center", center, 0.1f, -1000.0f, 1000.0f);
 	ImGui::DragFloat("Radius", &radius, 0.1f);
 	ImGui::DragFloat("Height", &height, 0.1f);
 

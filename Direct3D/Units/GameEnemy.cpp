@@ -1,60 +1,44 @@
 #include "stdafx.h"
 #include "GameEnemy.h"
+#include "GamePlayer.h"
 #include "GameData.h"
 #include "AiContext.h"
 #include "AiState.h"
 
-#include "../Model/Bounding/BoundingBox.h"
-#include "../Model/Bounding/Ray.h"
-
-GameEnemy::GameEnemy(wstring path)
-	: GameUnit(path)
-	, unitClass(UnitClassId::Unknown)
-	, specData(NULL)
+GameEnemy::GameEnemy(wstring matmeshFile, ANIMATION_TYPE animType)
+	: GameUnit(matmeshFile, animType)
 	, actionElapsedTime(0.0f)
-	, startAi(AiType::Search), startAiTime(0.0f)
+	, startAi(AiType::Idle), startAiTime(0.0f)
+	, player(NULL)
 {
-	CreateWeapon(L"", L"");
-
 	//AI ÃÊ±âÈ­
 	{
 		aiContext = new AiContext();
-
+		
 		AiState* state = NULL;
 		state = new AiState();
-		state->Updating = bind(&GameEnemy::OnSearch, this, placeholders::_1);
-		aiSearch.first = aiContext->AddState(L"Search", state);
-		aiSearch.second = state;
+		//state->Starting  = NULL;
+		state->Updating  = bind(&GameEnemy::OnIdle, this, placeholders::_1);
+		//state->Finishing = NULL;
+		aiIdle.first = aiContext->AddState(L"Idle", state);
+		aiIdle.second = state;
 
 		state = new AiState();
-		state->Updating = bind(&GameEnemy::OnMove, this, placeholders::_1);
-		aiMove.first = aiContext->AddState(L"Move", state);
-		aiMove.second = state;
+		state->Updating = bind(&GameEnemy::OnFollow, this, placeholders::_1);
+		aiFollow.first = aiContext->AddState(L"Follow", state);
+		aiFollow.second = state;
 
 		state = new AiState();
 		state->Updating = bind(&GameEnemy::OnAttack, this, placeholders::_1);
 		aiAttack.first = aiContext->AddState(L"Attack", state);
 		aiAttack.second = state;
-
-		state = new AiState();
-		state->Updating = bind(&GameEnemy::OnTurnLeft, this, placeholders::_1);
-		aiTurnLeft.first = aiContext->AddState(L"TurnLeft", state);
-		aiTurnLeft.second = state;
-
-		state = new AiState();
-		state->Updating = bind(&GameEnemy::OnTurnRight, this, placeholders::_1);
-		aiTurnRight.first = aiContext->AddState(L"TurnRight", state);
-		aiTurnRight.second = state;
 	}
 	aiContext->Enable(true);
 	aiContext->StartState((UINT)startAi, startAiTime);
-
-	box = new BoundingBox(this, min, max);
 }
 
 GameEnemy::~GameEnemy()
 {
-	SAFE_DELETE(box);
 	SAFE_DELETE(aiContext);
 }
 
@@ -69,29 +53,19 @@ void GameEnemy::Render(void)
 	GameUnit::Render();
 }
 
-void GameEnemy::OnSearch(AiState* state)
+void GameEnemy::OnIdle(AiState* state)
 {
-	OnAiSearch(state);
+	OnAiIdle(state);
 }
 
-void GameEnemy::OnMove(AiState* state)
+void GameEnemy::OnFollow(AiState* state)
 {
-	OnAiMove(state);
+	OnAiFollow(state);
 }
 
 void GameEnemy::OnAttack(AiState* state)
 {
 	OnAiAttack(state);
-}
-
-void GameEnemy::OnTurnLeft(AiState* state)
-{
-	OnAiTurnLeft(state);
-}
-
-void GameEnemy::OnTurnRight(AiState* state)
-{
-	OnAiTurnRight(state);
 }
 
 void GameEnemy::SetStartAi(AiType type, float time)
@@ -102,11 +76,9 @@ void GameEnemy::SetStartAi(AiType type, float time)
 	UINT index = (UINT)-1;
 	switch (type)
 	{
-	case GameEnemy::AiType::Search:		index = aiSearch.first;		break;
-	case GameEnemy::AiType::Move:		index = aiMove.first;		break;
-	case GameEnemy::AiType::Attack:		index = aiAttack.first;		break;
-	case GameEnemy::AiType::TurnLeft:	index = aiTurnLeft.first;	break;
-	case GameEnemy::AiType::TurnRight:	index = aiTurnRight.first;	break;
+	case AiType::Idle:		index = aiIdle.first;		break;
+	case AiType::Follow:	index = aiFollow.first;		break;
+	case AiType::Attack:	index = aiAttack.first;		break;
 	default: assert(false);
 	}
 
@@ -119,14 +91,36 @@ void GameEnemy::NextAi(AiType type, float time)
 	UINT index = (UINT)-1;
 	switch (type)
 	{
-	case GameEnemy::AiType::Search:		index = aiSearch.first;		break;
-	case GameEnemy::AiType::Move:		index = aiMove.first;		break;
-	case GameEnemy::AiType::Attack:		index = aiAttack.first;		break;
-	case GameEnemy::AiType::TurnLeft:	index = aiTurnLeft.first;	break;
-	case GameEnemy::AiType::TurnRight:	index = aiTurnRight.first;	break;
+	case AiType::Idle:		index = aiIdle.first;		break;
+	case AiType::Follow:	index = aiFollow.first;		break;
+	case AiType::Attack:	index = aiAttack.first;		break;
 	default: assert(false);
 	}
 
 	aiContext->Enable(true);
 	aiContext->NextState(index, time);
+}
+
+float GameEnemy::CalcDistancePlayer(void)
+{
+	D3DXVECTOR3 pPos, ePos;
+	player->GetPosition(pPos);
+	this->GetPosition(ePos);
+	D3DXVECTOR3 vec = pPos - ePos;
+	vec.y = 0.0f;
+	float dist = D3DXVec3Length(&vec);
+
+	return dist;
+}
+
+void GameEnemy::CalcDistancePlayer(D3DXVECTOR3 & dir, float & dist)
+{
+	D3DXVECTOR3 pPos, ePos;
+	player->GetPosition(pPos);
+	this->GetPosition(ePos);
+	D3DXVECTOR3 vec = pPos - ePos;
+	vec.y = 0.0f;
+	dist = D3DXVec3Length(&vec);
+	
+	D3DXVec3Normalize(&dir, &vec);
 }

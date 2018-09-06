@@ -34,6 +34,14 @@ public:
 
 	inline D3DXCOLOR& GetColorRef(void) { return color; }
 	inline void SetColor(D3DXCOLOR value) { color = value; }
+	inline bool GetShow(void) { return bShow; }
+	inline bool& GetShowRef(void) { return bShow; }
+	inline bool GetEnable(void) { return bEnable; }
+	inline void SetShow(bool b) { bShow = b; }
+	inline void SetEnable(bool b) { bEnable = b; }
+
+
+
 	inline BoundingType GetBoundingType(void) { return type; }
 	inline BoundingProp GetBoundingProp(void) { return prop; }
 	inline void SetBoundingProp(BoundingProp prop) { this->prop = prop; }
@@ -51,6 +59,7 @@ protected:
 	string		name;
 	D3DXCOLOR	color;
 	bool		bShow;
+	bool		bEnable;
 
 	BoundingType type;
 	BoundingProp prop;

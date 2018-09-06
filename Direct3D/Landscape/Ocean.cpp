@@ -8,7 +8,7 @@ Ocean::Ocean(ExecuteValues* values, UINT width, UINT height, float thick, Textur
 	, bWireframe(false)
 	, heightMap(heightMap)
 {
-	material = new Material(Shaders + L"998_Ocean.hlsl");
+	material = new Material(Shaders + L"Ocean.hlsl");
 	material->SetDiffuse(D3DXCOLOR(0.6f, 0.721f, 0.937f, 0.627f));
 	material->SetNormalMap(Contents + L"Landscape/WaveNormal.png");
 	material->SetShininess(500);

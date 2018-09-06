@@ -97,7 +97,7 @@ void Fbx::Exporter::ExportMaterial(wstring saveFolder, wstring saveName)
 		prop = fbxMaterial->FindProperty(FbxSurfaceMaterial::sEmissive);
 		material->EmissiveFile = Utility::GetTextureFile(prop);
 
-		prop = fbxMaterial->FindProperty(FbxSurfaceMaterial::sBump);
+		prop = fbxMaterial->FindProperty(FbxSurfaceMaterial::sNormalMap);
 		material->NormalFile = Utility::GetTextureFile(prop);
 
 		materials.push_back(material);
@@ -545,7 +545,12 @@ void Fbx::Exporter::WriteAnimation(wstring saveFolder, wstring saveName)
 		BinaryWriter* w = new BinaryWriter();
 		wstring fileName = saveFolder + saveName;
 		//fileName += String::ToWString(anim->Name);
-		fileName += String::WSInt(L"-%02d.anim", i);
+		
+		if (animDatas.size() == 1)
+			fileName += L".anim";
+		else
+			fileName += String::WSInt(L"-%02d.anim", i);
+		
 		w->Open(fileName);
 
 		float Duration = anim->TotalFrame / anim->FrameRate;

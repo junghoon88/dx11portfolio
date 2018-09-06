@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "GameSettings.h"
 #include "GamePlayer.h"
-#include "EnemyTank.h"
 
 #include "../Landscape/Terrain.h"
 
@@ -11,7 +10,6 @@ Landscape::Terrain* GameSettings::terrain = NULL;
 
 GameSettings::GameSettings(ExecuteValues* values)
 	: values(values)
-	, tank(NULL)
 {
 	CreateEnvironment();
 	CreatePlayer();
@@ -22,7 +20,6 @@ GameSettings::GameSettings(ExecuteValues* values)
 GameSettings::~GameSettings()
 {
 	SAFE_DELETE(terrain);
-	SAFE_DELETE(tank);
 	SAFE_DELETE(player);
 }
 
@@ -30,7 +27,6 @@ void GameSettings::Update(void)
 {
 	if (terrain) terrain->Update();
 
-	if (tank)	tank->Update();
 	if (player) player->Update();
 }
 
@@ -38,7 +34,6 @@ void GameSettings::Render()
 {
 	if (terrain) terrain->Render();
 
-	if (tank)	tank->Render();
 	if (player) player->Render();
 }
 
@@ -46,7 +41,6 @@ void GameSettings::PostRender(void)
 {
 	if (terrain) terrain->PostRender();
 
-	if (tank)	 tank->PostRender();
 }
 
 void GameSettings::CreateEnvironment(void)
@@ -62,11 +56,5 @@ void GameSettings::CreatePlayer(void)
 
 void GameSettings::CreateEnemy(void)
 {
-	tank = new EnemyTank(Models + L"RobotGame/Tiger/");
-	tank->SetStartAi(GameEnemy::AiType::Move, 1);
-
-	D3DXMATRIX R;
-	D3DXMatrixRotationY(&R, Math::ToRadian(180));
-	tank->SetRootAxis(R);
 }
 

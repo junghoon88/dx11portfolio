@@ -103,9 +103,6 @@
     <ClCompile Include="Fbx\Utility.cpp">
       <Filter>Fbx</Filter>
     </ClCompile>
-    <ClCompile Include="Gizmo\Geometry.cpp">
-      <Filter>Gizmo</Filter>
-    </ClCompile>
     <ClCompile Include="Model\ModelAnimPlayer.cpp">
       <Filter>Model</Filter>
     </ClCompile>
@@ -145,23 +142,11 @@
     <ClCompile Include="Units\GameUnit.cpp">
       <Filter>Units</Filter>
     </ClCompile>
-    <ClCompile Include="Executes\DrawModel.cpp">
-      <Filter>Executes</Filter>
-    </ClCompile>
-    <ClCompile Include="Units\PlayerBullet.cpp">
-      <Filter>Units</Filter>
-    </ClCompile>
     <ClCompile Include="Units\GameSettings.cpp">
-      <Filter>Units</Filter>
-    </ClCompile>
-    <ClCompile Include="Units\GameWeapon.cpp">
       <Filter>Units</Filter>
     </ClCompile>
     <ClCompile Include="Units\AiContext.cpp">
       <Filter>Units\Ai</Filter>
-    </ClCompile>
-    <ClCompile Include="Units\EnemyTank.cpp">
-      <Filter>Units\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Units\GameEnemy.cpp">
       <Filter>Units\Enemy</Filter>
@@ -174,9 +159,6 @@
     </ClCompile>
     <ClCompile Include="Executes\EditModel.cpp">
       <Filter>Executes</Filter>
-    </ClCompile>
-    <ClCompile Include="Landscape\GameTerrain.cpp">
-      <Filter>Landscape</Filter>
     </ClCompile>
     <ClCompile Include="Executes\EditLevel.cpp">
       <Filter>Executes</Filter>
@@ -216,6 +198,30 @@
     </ClCompile>
     <ClCompile Include="Model\Bounding\Bounding.cpp">
       <Filter>Model\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="Executes\DrawStage.cpp">
+      <Filter>Executes</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\GModelReadWrite.cpp">
+      <Filter>Objects\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewer\FollowCamera.cpp">
+      <Filter>Viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="GamePlayManager\GamePlayManager.cpp">
+      <Filter>GamePlayManager</Filter>
+    </ClCompile>
+    <ClCompile Include="GamePlayManager\EnemyRespawnManager.cpp">
+      <Filter>GamePlayManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Units\GameEnemyRobot.cpp">
+      <Filter>Units\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Landscape\TerrainQuadTree.cpp">
+      <Filter>Landscape</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewer\FrustumCulling.cpp">
+      <Filter>Viewer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -350,9 +356,6 @@
     <ClInclude Include="Fbx\Utility.h">
       <Filter>Fbx</Filter>
     </ClInclude>
-    <ClInclude Include="Gizmo\Geometry.h">
-      <Filter>Gizmo</Filter>
-    </ClInclude>
     <ClInclude Include="Fbx\BoneWeights.h">
       <Filter>Fbx</Filter>
     </ClInclude>
@@ -407,19 +410,10 @@
     <ClInclude Include="Units\GameUnit.h">
       <Filter>Units</Filter>
     </ClInclude>
-    <ClInclude Include="Executes\DrawModel.h">
-      <Filter>Executes</Filter>
-    </ClInclude>
     <ClInclude Include="Units\GameData.h">
       <Filter>Units</Filter>
     </ClInclude>
-    <ClInclude Include="Units\PlayerBullet.h">
-      <Filter>Units</Filter>
-    </ClInclude>
     <ClInclude Include="Units\GameSettings.h">
-      <Filter>Units</Filter>
-    </ClInclude>
-    <ClInclude Include="Units\GameWeapon.h">
       <Filter>Units</Filter>
     </ClInclude>
     <ClInclude Include="Units\AiContext.h">
@@ -427,9 +421,6 @@
     </ClInclude>
     <ClInclude Include="Units\AiState.h">
       <Filter>Units\Ai</Filter>
-    </ClInclude>
-    <ClInclude Include="Units\EnemyTank.h">
-      <Filter>Units\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Units\EnemyMoveRoute.h">
       <Filter>Units\Enemy</Filter>
@@ -445,9 +436,6 @@
     </ClInclude>
     <ClInclude Include="Executes\EditModel.h">
       <Filter>Executes</Filter>
-    </ClInclude>
-    <ClInclude Include="Landscape\GameTerrain.h">
-      <Filter>Landscape</Filter>
     </ClInclude>
     <ClInclude Include="Executes\EditLevel.h">
       <Filter>Executes</Filter>
@@ -488,6 +476,30 @@
     <ClInclude Include="Model\Bounding\Bounding.h">
       <Filter>Model\Bounding</Filter>
     </ClInclude>
+    <ClInclude Include="Executes\DrawStage.h">
+      <Filter>Executes</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\GModelReadWrite.h">
+      <Filter>Objects\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewer\FollowCamera.h">
+      <Filter>Viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="GamePlayManager\GamePlayManager.h">
+      <Filter>GamePlayManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GamePlayManager\EnemyRespawnManager.h">
+      <Filter>GamePlayManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Units\GameEnemyRobot.h">
+      <Filter>Units\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Landscape\TerrainQuadTree.h">
+      <Filter>Landscape</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewer\FrustumCulling.h">
+      <Filter>Viewer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Executes">
@@ -519,9 +531,6 @@
     </Filter>
     <Filter Include="Fbx">
       <UniqueIdentifier>{a536967b-d853-430d-83e0-5176c3848d64}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Gizmo">
-      <UniqueIdentifier>{4ade93ca-3c62-4e96-a33c-cddfa8d0ca30}</UniqueIdentifier>
     </Filter>
     <Filter Include="Landscape">
       <UniqueIdentifier>{b01315db-23cf-4df1-befb-c6e36a6d537a}</UniqueIdentifier>
@@ -555,6 +564,9 @@
     </Filter>
     <Filter Include="Lights">
       <UniqueIdentifier>{65fe6c17-16a2-4031-b91d-3810eebc736e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GamePlayManager">
+      <UniqueIdentifier>{a2dd7a2b-eeaa-4fc8-ba3e-50c5181b229d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

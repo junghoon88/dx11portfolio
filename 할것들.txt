@@ -1,0 +1,25 @@
+전투 관련 할 것들
+
+EditLevel
+구조물 추가
+
+EditModel
+모델 복수개 불러오고 비교하며 볼 수 있도록
+
+
+DrawStage
+충돌처리
+
+Program
+모델에디트, 레벨에디트, 스테이지 변경할 수 있도록
+
+GamePlayer
+스펙 데이터
+동작, 공격 콤보
+
+GameEnemy
+AI 수정
+
+GameBoss
+
+UI

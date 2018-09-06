@@ -25,6 +25,7 @@ struct ExecuteValues
 	class Perspective*			Perspective;
 	class Viewport*				Viewport;
 	class Camera*				MainCamera;
+	class FrustumCulling*		FrustumCulling;
 	class LightBuffer*			GlobalLight;
 	class TimeBuffer*			GlobalTime;
 	struct GuiSettings*			GuiSettings;
@@ -41,6 +42,7 @@ struct ExecuteValues
 		Perspective		= NULL;
 		Viewport		= NULL;
 		MainCamera		= NULL;
+		FrustumCulling  = NULL;
 		GlobalLight		= NULL;
 		GuiSettings		= NULL;
 

@@ -19,6 +19,7 @@ private:
 	class RenderBuffer;
 
 	friend class EditModel;
+	friend class GModelReadWriter;
 
 public:
 	GameModel(wstring file, ANIMATION_TYPE animType = ANIMATION_TYPE::Unknown);
@@ -42,9 +43,12 @@ public:
 protected:
 	void CalcPosition(void);
 
+	void SetShader(wstring shaderFile);
+
 	UINT AddClipAll(wstring path);
 	UINT AddClip(wstring file, bool bLoop = false);
 	UINT AddClip(AnimationClip* clip);
+	UINT FindClip(wstring name);
 	void RemoveClip(UINT index);
 	void ClearClips(void);
 
@@ -57,6 +61,10 @@ protected:
 	void StopAnim(void);
 	float GetPlayTime(wstring boneName);
 	float GetPlayProgress(void);
+
+	bool MousePickked(D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT float & dist);
+
+	Bounding* GetBounding(string name);
 
 
 public:
@@ -91,6 +99,7 @@ protected:
 	vector<AnimationClip*> clips;
 	vector<AnimationBlender*> blenders;
 	bool bPause;
+	bool isPlayEnd; //한번 실행하는 애니메이션이 끝났을 때
 
 	//capsule
 	vector<Bounding*> boundings;
@@ -112,16 +121,15 @@ private:
 				D3DXMatrixIdentity(&Data.Bones[i]);
 		}
 
-		void SetBones(D3DXMATRIX* m, UINT count)
+		void SetBones(vector<D3DXMATRIX>& bones)
 		{
+			UINT count = bones.size();
 			if (count > 128)
 				count = 128;
 
-			memcpy(Data.Bones, m, sizeof(D3DXMATRIX) * count);
-
 			//shader 전달하기 위해 transpose
 			for (UINT i = 0; i < count; i++)
-				D3DXMatrixTranspose(&Data.Bones[i], &Data.Bones[i]);
+				D3DXMatrixTranspose(&Data.Bones[i], &bones[i]);
 		}
 
 	private:

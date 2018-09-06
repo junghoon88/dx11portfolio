@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "MathDX.h"
 
+const D3DXVECTOR3 MathDX::Vector3MinValue = D3DXVECTOR3(-3E+38f, -3E+38f, -3E+38f);
+const D3DXVECTOR3 MathDX::Vector3MaxValue = D3DXVECTOR3( 3E+38f,  3E+38f,  3E+38f);
+
 const D3DXCOLOR MathDX::Red		= D3DXCOLOR(1, 0, 0, 1);
 const D3DXCOLOR MathDX::Green	= D3DXCOLOR(0, 1, 0, 1);
 const D3DXCOLOR MathDX::Blue	= D3DXCOLOR(0, 0, 1, 1);
@@ -17,6 +20,20 @@ const D3DXMATRIX MathDX::matIdentity =
 	0, 0, 1, 0,
 	0, 0, 0, 1
 };
+
+void MathDX::GetMinValue(IN D3DXVECTOR3 & vec1, OUT D3DXVECTOR3 & vec2)
+{
+	if (vec2.x > vec1.x)	vec2.x = vec1.x;
+	if (vec2.y > vec1.y)	vec2.y = vec1.y;
+	if (vec2.z > vec1.z)	vec2.z = vec1.z;
+}
+
+void MathDX::GetMaxValue(IN D3DXVECTOR3 & vec1, OUT D3DXVECTOR3 & vec2)
+{
+	if (vec2.x < vec1.x)	vec2.x = vec1.x;
+	if (vec2.y < vec1.y)	vec2.y = vec1.y;
+	if (vec2.z < vec1.z)	vec2.z = vec1.z;
+}
 
 bool MathDX::DecomposeTransform(D3DXMATRIX & mat, D3DXVECTOR3 & vs, D3DXVECTOR3 & vr, D3DXVECTOR3 & vt)
 {

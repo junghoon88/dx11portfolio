@@ -25,14 +25,14 @@ private:
 	void Play(AiState* state, float activeTime);
 
 public:
-	inline AiState* GetActive(void) { return active; }
+	inline AiState* GetCurrent(void) { return current; }
 	inline AiState* GetNext(void) { return next; }
 
 private:
 	bool bActive;
 	bool bEnable;
 
-	AiState* active;
+	AiState* current;
 	AiState* next;
 
 	vector<AiState*> states;
