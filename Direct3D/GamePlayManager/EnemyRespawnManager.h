@@ -27,12 +27,14 @@ public:
 	~EnemyRespawnManager();
 
 	void Update(void);
+	void AddArea(EnemyArea area);
 
 private:
 	bool FindArea(string name, OUT EnemyArea* area);
 	void RespawnRobot(EnemyArea& area, UINT num);
 
 public:
+
 	inline void SetBattleStart(bool b) { battleStart = b; }
 	inline void SetBattleEnd(bool b) { battleEnd = b; }
 	inline bool GetBattleStart(void) { return battleStart; }

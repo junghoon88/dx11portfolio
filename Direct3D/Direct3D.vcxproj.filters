@@ -223,6 +223,12 @@
     <ClCompile Include="Viewer\FrustumCulling.cpp">
       <Filter>Viewer</Filter>
     </ClCompile>
+    <ClCompile Include="Model\Bounding\BoundingCollision.cpp">
+      <Filter>Model\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="Units\UnitHpBar.cpp">
+      <Filter>Units</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -499,6 +505,12 @@
     </ClInclude>
     <ClInclude Include="Viewer\FrustumCulling.h">
       <Filter>Viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Bounding\BoundingCollision.h">
+      <Filter>Model\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="Units\UnitHpBar.h">
+      <Filter>Units</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

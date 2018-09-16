@@ -112,6 +112,7 @@
     <ClCompile Include="Model\Bounding\Bounding.cpp" />
     <ClCompile Include="Model\Bounding\BoundingBox.cpp" />
     <ClCompile Include="Model\Bounding\BoundingCapsule.cpp" />
+    <ClCompile Include="Model\Bounding\BoundingCollision.cpp" />
     <ClCompile Include="Model\Bounding\BoundingFrustum.cpp" />
     <ClCompile Include="Model\Bounding\BoundingSphere.cpp" />
     <ClCompile Include="Model\Bounding\ModelShape.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="Units\GamePlayer.cpp" />
     <ClCompile Include="Units\GameSettings.cpp" />
     <ClCompile Include="Units\GameUnit.cpp" />
+    <ClCompile Include="Units\UnitHpBar.cpp" />
     <ClCompile Include="Utilities\BinaryFile.cpp" />
     <ClCompile Include="Utilities\JsonManager.cpp" />
     <ClCompile Include="Utilities\Math.cpp" />
@@ -200,6 +202,7 @@
     <ClInclude Include="Model\Bounding\Bounding.h" />
     <ClInclude Include="Model\Bounding\BoundingBox.h" />
     <ClInclude Include="Model\Bounding\BoundingCapsule.h" />
+    <ClInclude Include="Model\Bounding\BoundingCollision.h" />
     <ClInclude Include="Model\Bounding\BoundingFrustum.h" />
     <ClInclude Include="Model\Bounding\BoundingSphere.h" />
     <ClInclude Include="Model\Bounding\ModelShape.h" />
@@ -246,6 +249,7 @@
     <ClInclude Include="Units\GamePlayerInput.h" />
     <ClInclude Include="Units\GameSettings.h" />
     <ClInclude Include="Units\GameUnit.h" />
+    <ClInclude Include="Units\UnitHpBar.h" />
     <ClInclude Include="Utilities\BinaryFile.h" />
     <ClInclude Include="Utilities\JsonManager.h" />
     <ClInclude Include="Utilities\Math.h" />

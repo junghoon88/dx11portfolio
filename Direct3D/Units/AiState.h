@@ -4,18 +4,10 @@
 struct AiState
 {
 	wstring Name;
-	float ActiveTime;
 
 	function<void(AiState*)> Starting  = NULL;
 	function<void(AiState*)> Finishing = NULL;
 	function<void(AiState*)> Updating  = NULL;
-
-	bool IsActive() { return (ActiveTime > 0.0f); }
-
-	void Reset(void)
-	{
-		ActiveTime = 0.0f;
-	}
 
 	void Update(void)
 	{

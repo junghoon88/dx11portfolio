@@ -3,9 +3,10 @@
 class GameModel;
 class GamePlayer;
 class GameEnemy;
+class GamePlayManager;
 
-#include "../Landscape/Terrain.h"
-#include "../Environment/Sky.h"
+namespace Landscape { class Terrain; class Ocean; }
+namespace Environment { class Sky; }
 
 class DrawStage : public Execute
 {
@@ -41,10 +42,11 @@ private:
 
 	Landscape::Terrain* terrain;
 	Environment::Sky* sky;
+	Landscape::Ocean* ocean;
 
 	vector<GameModel*> staticModels;
 
-
+	GamePlayManager*	gamePlayManager;
 	//Player, Enemy
 	GamePlayer*			player;
 	vector<GameEnemy*>  enemies;

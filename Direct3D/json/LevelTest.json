@@ -20,13 +20,33 @@
       }
    },
    "Landscape" : {
+      "Ocean" : {
+         "BumpHeight" : 0.5,
+         "BumpSpeed" : [ 0.0, -0.10000000149011612 ],
+         "DeepColor" : [ 0.20000000298023224, 0.5, 0.94999998807907104, 1.0 ],
+         "FresnelAmount" : 0.5,
+         "FresnelBias" : 0.80000001192092896,
+         "FresnelPower" : 0.5,
+         "Height" : 60,
+         "HeightRatio" : 7.5,
+         "ShallowColor" : [ 0.69999998807907104, 0.85000002384185791, 0.80000001192092896, 1.0 ],
+         "ShoreBlend" : 35.0,
+         "SpecularAmount" : 0.5,
+         "TextureScale" : [ 2.0, 3.0 ],
+         "Thick" : 2,
+         "WaveAmplitude" : 1.0,
+         "WaveFrequency" : 0.05000000074505806,
+         "Width" : 54,
+         "XOffset" : 133,
+         "YOffset" : 0
+      },
       "Terrain" : {
-         "Alpha Map 0" : [ "" ],
-         "Alpha Map 1" : [ "" ],
+         "Alpha Map 0" : [ "../_Contents/Landscape/AlphaMap1.png" ],
+         "Alpha Map 1" : [ "../_Contents/Landscape/AlphaMap2.png" ],
          "Brush Color Hover" : [ 1.0, 0.0, 0.0, 1.0 ],
-         "Brush Color Selected" : [ 0.0, 0.0, 1.0, 1.0 ],
+         "Brush Color Selected" : [ 0.32802289724349976, 0.32806345820426941, 0.91666668653488159, 1.0 ],
          "Detail Map" : [ "../_Contents/Landscape/Dirt3_detail.png" ],
-         "Diffuse Map" : [ "../_Contents/Landscape/Dirt2.png" ],
+         "Diffuse Map" : [ "../_Contents/Landscape/terrain/desert_sand_d.jpg" ],
          "EnemyArea" : {
             "EnemyArea0-Color" : [ 0.92647057771682739, 0.20891004800796509, 0.20891004800796509, 1.0 ],
             "EnemyArea0-Name" : [ "Phase1" ],
@@ -39,16 +59,23 @@
             "EnemyAreaCount" : 2
          },
          "Grid Color" : [ 0.030036540701985359, 0.61274510622024536, 0.11572892218828201, 1.0 ],
-         "Grid Spacing" : 1,
+         "Grid Spacing" : 10,
          "Grid Thickness" : 0.029999999329447746,
-         "Height Map" : [ "../_Contents/Landscape/HeightMap.png" ],
-         "Shader File" : [ "./Shaders/Terrain.hlsl" ],
-         "Textures0" : [ "../_Contents/Landscape/terrain/adesert_cracks_d.jpg" ],
-         "Textures1" : [ "../_Contents/Landscape/terrain/desert_mntn2_d.jpg" ],
-         "Textures2" : [ "../_Contents/Landscape/terrain/desert_sand_d.jpg" ],
-         "Textures3" : [ "../_Contents/Landscape/terrain/grass_rocky_d.jpg" ],
-         "Textures4" : [ "../_Contents/Landscape/terrain/grass_mix_d.jpg" ],
-         "Textures5" : [ "../_Contents/Landscape/terrain/snow1_d.jpg" ]
+         "Height Map" : [ "../_Contents/Landscape/HeightMap2.png" ],
+         "Normal Map" : [ "../_Contents/Landscape/terrain/desert_sand_n.jpg" ],
+         "Shader File" : [ "../Direct3D/Shaders/Terrain.hlsl" ],
+         "SubDiffuse0" : [ "../_Contents/Landscape/terrain/ground_mud_d.jpg" ],
+         "SubDiffuse1" : [ "../_Contents/Landscape/terrain/grass_mix_d.jpg" ],
+         "SubDiffuse2" : [ "../_Contents/Landscape/terrain/ground_crackedo_d.jpg" ],
+         "SubDiffuse3" : [ "../_Contents/Landscape/terrain/jungle_stone_d.jpg" ],
+         "SubDiffuse4" : [ "../_Contents/Landscape/terrain/snow_grass_d.jpg" ],
+         "SubDiffuse5" : [ "../_Contents/Landscape/terrain/ground_cracks2v_d.jpg" ],
+         "SubNormal0" : [ "../_Contents/Landscape/terrain/ground_mud_n.jpg" ],
+         "SubNormal1" : [ "../_Contents/Landscape/terrain/grass_mix_n.jpg" ],
+         "SubNormal2" : [ "" ],
+         "SubNormal3" : [ "../_Contents/Landscape/terrain/jungle_stone_n.jpg" ],
+         "SubNormal4" : [ "" ],
+         "SubNormal5" : [ "" ]
       }
    },
    "Lights" : {
@@ -61,6 +88,6 @@
    },
    "Positions" : {
       "Player Color" : [ 0.16176468133926392, 0.16176460683345795, 0.0095155686140060425, 1.0 ],
-      "Player Position" : [ 0.0, 0.0, 0.0 ]
+      "Player Position" : [ 7.6000003814697266, 0.0, 8.9000005722045898 ]
    }
 }

@@ -16,24 +16,21 @@ public:
 	void RemoveState(UINT index);
 	void RemoveStateAll(void);
 
-	void NextState(UINT index, float activeTime);
-	void StartState(UINT index, float activeTime);
+	void StartState(UINT index);
 
 private:
 
-	void Play(UINT index, float activeTime);
-	void Play(AiState* state, float activeTime);
+	void Play(UINT index);
+	void Play(AiState* state);
 
 public:
 	inline AiState* GetCurrent(void) { return current; }
-	inline AiState* GetNext(void) { return next; }
 
 private:
 	bool bActive;
 	bool bEnable;
 
 	AiState* current;
-	AiState* next;
 
 	vector<AiState*> states;
 };

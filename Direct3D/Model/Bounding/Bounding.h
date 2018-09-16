@@ -25,6 +25,8 @@ public:
 	virtual void PostRender(void);
 	virtual void GetCorners(vector<D3DXVECTOR3>& vec) = 0;
 
+	bool FindAttackList(GameModel* model);
+
 public:
 	inline GameModel* GetMyModel(void) { return mymodel; }
 	inline int GetSocketnum(void) { return socketnum; }
@@ -38,9 +40,10 @@ public:
 	inline bool& GetShowRef(void) { return bShow; }
 	inline bool GetEnable(void) { return bEnable; }
 	inline void SetShow(bool b) { bShow = b; }
-	inline void SetEnable(bool b) { bEnable = b; }
+	inline void SetEnable(bool b) { bEnable = b; attackList.clear(); }
 
-
+	inline void AddAttackList(GameModel* model) { attackList.insert(model); }
+	
 
 	inline BoundingType GetBoundingType(void) { return type; }
 	inline BoundingProp GetBoundingProp(void) { return prop; }
@@ -67,4 +70,6 @@ protected:
 	TRANSFORM	transform;			// 자기자신의 월드
 	D3DXMATRIX	socketTransform;	// 모델이 있을 때 모델의 소캣 월드
 	D3DXMATRIX	myWorld;			// 모델의 월드까지 감안한 최종 월드
+
+	set<GameModel*> attackList;
 };

@@ -4,11 +4,12 @@
 #include "GameData.h"
 #include "AiContext.h"
 #include "AiState.h"
+#include "UnitHpBar.h"
 
 GameEnemy::GameEnemy(wstring matmeshFile, ANIMATION_TYPE animType)
 	: GameUnit(matmeshFile, animType)
 	, actionElapsedTime(0.0f)
-	, startAi(AiType::Idle), startAiTime(0.0f)
+	, startAi(AiType::Idle)
 	, player(NULL)
 {
 	//AI ÃÊ±âÈ­
@@ -32,25 +33,47 @@ GameEnemy::GameEnemy(wstring matmeshFile, ANIMATION_TYPE animType)
 		state->Updating = bind(&GameEnemy::OnAttack, this, placeholders::_1);
 		aiAttack.first = aiContext->AddState(L"Attack", state);
 		aiAttack.second = state;
+
+		state = new AiState();
+		state->Updating = bind(&GameEnemy::OnDamage, this, placeholders::_1);
+		aiDamage.first = aiContext->AddState(L"Damage", state);
+		aiDamage.second = state;
+
+		state = new AiState();
+		state->Updating = bind(&GameEnemy::OnDeath, this, placeholders::_1);
+		aiDeath.first = aiContext->AddState(L"Death", state);
+		aiDeath.second = state;
 	}
 	aiContext->Enable(true);
-	aiContext->StartState((UINT)startAi, startAiTime);
+	aiContext->StartState((UINT)startAi);
+
+
+	hpBar = new UnitHpBar(this);
+
 }
 
 GameEnemy::~GameEnemy()
 {
 	SAFE_DELETE(aiContext);
+	SAFE_DELETE(hpBar);
+
 }
 
 void GameEnemy::Update(void)
 {
 	aiContext->Update();
 	GameUnit::Update();
+
+
+	hpBar->Update(unitInfo.HP / unitInfo.HPMax);
 }
 
 void GameEnemy::Render(void)
 {
 	GameUnit::Render();
+
+	hpBar->Render();
+
 }
 
 void GameEnemy::OnIdle(AiState* state)
@@ -68,37 +91,33 @@ void GameEnemy::OnAttack(AiState* state)
 	OnAiAttack(state);
 }
 
-void GameEnemy::SetStartAi(AiType type, float time)
+void GameEnemy::OnDamage(AiState * state)
 {
-	startAi = type;
-	startAiTime = time;
-
-	UINT index = (UINT)-1;
-	switch (type)
-	{
-	case AiType::Idle:		index = aiIdle.first;		break;
-	case AiType::Follow:	index = aiFollow.first;		break;
-	case AiType::Attack:	index = aiAttack.first;		break;
-	default: assert(false);
-	}
-
-	aiContext->Enable(true);
-	aiContext->StartState(index, time);
+	OnAiDamage(state);
 }
 
-void GameEnemy::NextAi(AiType type, float time)
+void GameEnemy::OnDeath(AiState * state)
 {
+	OnAiDeath(state);
+}
+
+void GameEnemy::SetStartAi(AiType type)
+{
+	startAi = type;
+
 	UINT index = (UINT)-1;
 	switch (type)
 	{
 	case AiType::Idle:		index = aiIdle.first;		break;
 	case AiType::Follow:	index = aiFollow.first;		break;
 	case AiType::Attack:	index = aiAttack.first;		break;
+	case AiType::Damage:	index = aiDamage.first;		break;
+	case AiType::Death:		index = aiDeath.first;		break;
 	default: assert(false);
 	}
 
 	aiContext->Enable(true);
-	aiContext->NextState(index, time);
+	aiContext->StartState(index);
 }
 
 float GameEnemy::CalcDistancePlayer(void)

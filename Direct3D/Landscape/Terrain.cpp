@@ -10,14 +10,14 @@
 #include "../Utilities/Xml.h"
 
 #define USE_ASTAR 0
-#define USE_TREE 0
+#define USE_TREE  0
 
 Landscape::Terrain::Terrain(ExecuteValues* values)
 	: values(values)
 	, material(NULL)
 	, terrainData(NULL)
 	, editmode(EDITMODE_ALPHATEXTURE)
-	, intensity(1)
+	, intensity(50)
 	, vertexDataOld(NULL)
 	, bChangeTerrain(false)
 	, showAreaIndex(0)
@@ -36,7 +36,8 @@ Landscape::Terrain::Terrain(ExecuteValues* values)
 	States::CreateSampler(&samplerDesc, &detailSampler);
 
 	selectTexture = 0;
-	ZeroMemory(&textures, sizeof(Texture*) * TEXTURE_MAX);
+	ZeroMemory(&subDiffuse, sizeof(Texture*) * TEXTURE_MAX);
+	ZeroMemory(&subNormal, sizeof(Texture*) * TEXTURE_MAX);
 
 #if USE_ASTAR
 	astar = new AStar(this);
@@ -56,11 +57,10 @@ Landscape::Terrain::~Terrain()
 	}
 #endif
 
-	SaveXmlTerrain(LevelDatas + L"Terrain.data");
-
 	for (UINT i = 0; i < TEXTURE_MAX; i++)
 	{
-		SAFE_DELETE(textures[i]);
+		SAFE_DELETE(subDiffuse[i]);
+		SAFE_DELETE(subNormal[i]);
 	}
 
 	SAFE_RELEASE(diffuseSampler);
@@ -78,11 +78,13 @@ void Landscape::Terrain::LoadData(Json::Value * value)
 {
 	wstring shaderFile = Shaders + L"Terrain.hlsl";
 	wstring diffuseMap = Contents + L"Landscape/Dirt3.png";
+	wstring normalMap = L"";
 	wstring detailMap = Contents + L"Landscape/Dirt3_detail.png";
 
 	wstring heightMap = Contents + L"Landscape/HeightMap.png";
 	wstring alphaMap[ALPHAMAP_MAX] = { L"", L"" };
-	wstring alphaTextures[TEXTURE_MAX] = { L"", L"", L"", L"", L"", L"" };
+	wstring alphaDiffuse[TEXTURE_MAX] = { L"", L"", L"", L"", L"", L"" };
+	wstring alphaNormal[TEXTURE_MAX] = { L"", L"", L"", L"", L"", L"" };
 
 	Json::Value terrainValue = (*value)["Landscape"]["Terrain"];
 	if (terrainValue.isNull() == false)
@@ -93,6 +95,8 @@ void Landscape::Terrain::LoadData(Json::Value * value)
 			Json::GetValue(terrainValue, "Shader File", shaderFile);
 			//Diffuse Map
 			Json::GetValue(terrainValue, "Diffuse Map", diffuseMap);
+			//Normal Map
+			Json::GetValue(terrainValue, "Normal Map", normalMap);
 			//Detail Map
 			Json::GetValue(terrainValue, "Detail Map", detailMap);
 		}
@@ -120,7 +124,8 @@ void Landscape::Terrain::LoadData(Json::Value * value)
 		//Textures
 		for (UINT i = 0; i < TEXTURE_MAX; i++)
 		{
-			Json::GetValue(terrainValue, String::SInt("Textures%d", i), alphaTextures[i]);
+			Json::GetValue(terrainValue, String::SInt("SubDiffuse%d", i), alphaDiffuse[i]);
+			Json::GetValue(terrainValue, String::SInt("SubNormal%d", i),  alphaNormal[i]);
 		}
 
 		//EnemyArea
@@ -146,10 +151,11 @@ void Landscape::Terrain::LoadData(Json::Value * value)
 
 	material = new Material(shaderFile);
 	material->SetDiffuseMap(diffuseMap);
+	material->SetNormalMap(normalMap);
 	material->SetDetailMap(detailMap);
 
-	//terrainData = new TerrainData(heightMap);
-	terrainData = new TerrainQuadTree(heightMap);
+	terrainData = new TerrainData(heightMap);
+	//terrainData = new TerrainQuadTree(heightMap);
 
 	for (UINT i = 0; i < ALPHAMAP_MAX; i++)
 	{
@@ -160,8 +166,8 @@ void Landscape::Terrain::LoadData(Json::Value * value)
 	
 	for (UINT i = 0; i < TEXTURE_MAX; i++)
 	{
-		if (alphaTextures[i].length() > 0)
-			ChangeTexture(i, alphaTextures[i]);
+		ChangeSubDiffuse(i, alphaDiffuse[i]);
+		ChangeSubNormal(i,  alphaNormal[i]);
 	}
 }
 
@@ -175,6 +181,8 @@ void Landscape::Terrain::SaveData(Json::Value * value)
 		Json::SetValue(terrainValue, "Shader File", material->GetShader()->GetFile());
 		//Diffuse Map
 		Json::SetValue(terrainValue, "Diffuse Map", material->GetDiffuseMap()->GetFile());
+		//Normal Map
+		Json::SetValue(terrainValue, "Normal Map", material->GetNormalMap()->GetFile());
 		//Detail Map
 		Json::SetValue(terrainValue, "Detail Map", material->GetDetailMap()->GetFile());
 	}
@@ -200,15 +208,19 @@ void Landscape::Terrain::SaveData(Json::Value * value)
 	}
 
 	//Textures
+	string blank = "";
 	for (UINT i = 0; i < TEXTURE_MAX; i++)
 	{
-		if (textures[i] == NULL)
-		{
-			string blank = "";
-			Json::SetValue(terrainValue, String::SInt("Textures%d", i), blank);
-			continue;
-		}
-		Json::SetValue(terrainValue, String::SInt("Textures%d", i), textures[i]->GetFile());
+		if (subDiffuse[i] == NULL)
+			Json::SetValue(terrainValue, String::SInt("SubDiffuse%d", i), blank);
+		else
+			Json::SetValue(terrainValue, String::SInt("SubDiffuse%d", i), subDiffuse[i]->GetFile());
+
+		//normals
+		if (subNormal[i] == NULL)
+			Json::SetValue(terrainValue, String::SInt("SubNormal%d", i), blank);
+		else
+			Json::SetValue(terrainValue, String::SInt("SubNormal%d", i), subNormal[i]->GetFile());
 	}
 
 	//EnemyArea
@@ -289,12 +301,13 @@ void Landscape::Terrain::Render(void)
 		enemyAreaBuffer->SetPSBuffer(3);
 		material->SetBuffer();
 
-		Texture::SetShaderResources(5, TEXTURE_MAX, textures);
+		Texture::SetShaderResources(5, TEXTURE_MAX, subDiffuse);
+		Texture::SetShaderResources(11, TEXTURE_MAX, subNormal);
 
 		gDC->PSSetSamplers(0, 1, &diffuseSampler);
 		gDC->PSSetSamplers(1, 1, &detailSampler);
 
-		terrainData->Render(values->FrustumCulling);
+		terrainData->Render();
 	}
 
 
@@ -407,10 +420,10 @@ void Landscape::Terrain::UpdateMouse(void)
 					{
 						if (bChangeTerrain)
 						{
-							VertexTypePTNC2* vertexDataNew = NULL;
+							TerrainVertexType* vertexDataNew = NULL;
 							terrainData->CopyVertexDataTo(&vertexDataNew);
 
-							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
+							function<void(TerrainVertexType*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
 							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
 
 							vertexDataOld = NULL;
@@ -442,10 +455,10 @@ void Landscape::Terrain::UpdateMouse(void)
 					{
 						if (bChangeTerrain)
 						{
-							VertexTypePTNC2* vertexDataNew = NULL;
+							TerrainVertexType* vertexDataNew = NULL;
 							terrainData->CopyVertexDataTo(&vertexDataNew);
 
-							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
+							function<void(TerrainVertexType*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
 							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
 
 							vertexDataOld = NULL;
@@ -470,10 +483,10 @@ void Landscape::Terrain::UpdateMouse(void)
 					{
 						if (bChangeTerrain)
 						{
-							VertexTypePTNC2* vertexDataNew = NULL;
+							TerrainVertexType* vertexDataNew = NULL;
 							terrainData->CopyVertexDataTo(&vertexDataNew);
 
-							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
+							function<void(TerrainVertexType*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
 							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
 
 							vertexDataOld = NULL;
@@ -632,13 +645,14 @@ void Landscape::Terrain::UpdateKeyboard(void)
 					{
 						if (bChangeTerrain)
 						{
-							VertexTypePTNC2* vertexDataNew = NULL;
+							TerrainVertexType* vertexDataNew = NULL;
 							terrainData->CopyVertexDataTo(&vertexDataNew);
 
-							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
+							function<void(TerrainVertexType*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
 							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
 
 							vertexDataOld = NULL;
+
 							bChangeTerrain = false;
 						}
 					}
@@ -671,10 +685,10 @@ void Landscape::Terrain::UpdateKeyboard(void)
 					{
 						if (bChangeTerrain)
 						{
-							VertexTypePTNC2* vertexDataNew = NULL;
+							TerrainVertexType* vertexDataNew = NULL;
 							terrainData->CopyVertexDataTo(&vertexDataNew);
 
-							function<void(VertexTypePTNC2*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
+							function<void(TerrainVertexType*)> func = bind(&Landscape::Terrain::ChangeVertexData, this, placeholders::_1);
 							gCmdManager->AddCommand(new CommandTerrainUpDown(func, vertexDataOld, vertexDataNew));
 
 							vertexDataOld = NULL;
@@ -746,6 +760,18 @@ void Landscape::Terrain::PostRenderEditMenu(void)
 	}
 	ImGui::SliderInt("Edit Mode", (int*)&editmode, EDITMODE_ALPHATEXTURE, EDITMODE_MAX - 1);
 
+	wstring shaderFile = L"Load : ";
+	shaderFile += material->GetShader()->GetFile();
+	if (ImGui::Button(String::ToString(shaderFile).c_str()))
+	{
+		D3DDesc desc;
+		D3D::GetDesc(&desc);
+
+		function<void(wstring)> f = bind(&Landscape::Terrain::ChangeShader, this, placeholders::_1);
+		Path::OpenFileDialog(L"", Path::ShaderFilter, Shaders, f, desc.Handle);
+	}
+
+
 	if (editmode == EDITMODE_ALPHATEXTURE)
 	{
 		PostRenderTextures();
@@ -770,7 +796,6 @@ void Landscape::Terrain::PostRenderHeightMap(void)
 		terrainData->ClearVertexHeight();
 	}
 
-#if 0 //¿·±Ò ¡÷ºÆ
 	if (ImGui::Button("Load Height"))//, ImVec2(30, 30)))
 	{
 		D3DDesc desc;
@@ -789,7 +814,6 @@ void Landscape::Terrain::PostRenderHeightMap(void)
 		function<void(wstring)> func = bind(&Landscape::TerrainData::SaveHeightMap, terrainData, placeholders::_1);
 		Path::SaveFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
 	}
-#endif
 }
 
 void Landscape::Terrain::PostRenderTextures(void)
@@ -808,6 +832,25 @@ void Landscape::Terrain::PostRenderTextures(void)
 			Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
 		}
 	}
+	//Normal Map
+	{
+		ImGui::Text("Normal Map");
+		wstring wstr = L"";
+		if (material->GetNormalMap())
+		{
+			wstr = material->GetNormalMap()->GetFile();
+			String::Replace(&wstr, Contents, L"");
+		}
+		string str = "Load : " + String::ToString(wstr);
+		if (ImGui::Button(str.c_str()))
+		{
+			D3DDesc desc;
+			D3D::GetDesc(&desc);
+			function<void(wstring)> func = bind(&Landscape::Terrain::ChangeNormalMap, this, placeholders::_1);
+			Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
+		}
+	}
+
 
 	//Alpha Map
 	{
@@ -823,7 +866,6 @@ void Landscape::Terrain::PostRenderTextures(void)
 			char num[10];
 			sprintf(num, "%d", i + 1);
 
-#if 0
 			string str = string("Load Alpha Map") + string(num);
 			if (ImGui::Button(str.c_str()))
 			{
@@ -841,59 +883,114 @@ void Landscape::Terrain::PostRenderTextures(void)
 				function<void(wstring)> func = bind(&Landscape::TerrainData::SaveAlphaMap, terrainData, i, placeholders::_1);
 				Path::SaveFileDialog(L"", Path::ImageFilter, Textures, func, desc.Handle);
 			}
-#endif
 		}
 	}
 
-	//Textures
+	//subDiffuse
 	{
-		ImGui::Text("Textures");
+		ImGui::Text("SubDiffuse");
 		for (UINT i = 0; i < TEXTURE_MAX; i++)
 		{
 			bool bSelect = (selectTexture & (1 << i)) == (1 << i);
-			char num[10];
-			sprintf(num, "%d", i + 1);
 
 			//if (editmode == EDITMODE_ALPHATEXTURE)
 			{
-				if (ImGui::Checkbox(num, &bSelect))
+				if (ImGui::Checkbox(String::SInt("%d", i+1).c_str(), &bSelect))
 				{
 					selectTexture = bSelect ? (1 << i) : 0;
 				}
 				ImGui::SameLine();
 			}
 
-			if (textures[i] == NULL)
+			if (subDiffuse[i] == NULL)
 			{
-				string str = string("Load Texture") + string(num);
+				string str = String::SInt("Load SubDiffuse%d", i + 1);
 				if (ImGui::Button(str.c_str()))
 				{
 					D3DDesc desc;
 					D3D::GetDesc(&desc);
-					function<void(wstring)> func = bind(&Landscape::Terrain::ChangeTexture, this, i, placeholders::_1);
+					function<void(wstring)> func = bind(&Landscape::Terrain::ChangeSubDiffuse, this, i, placeholders::_1);
 					Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
 				}
 			}
 			else
 			{
-				wstring wstr = textures[i]->GetFile();
+				wstring wstr = subDiffuse[i]->GetFile();
 				String::Replace(&wstr, Contents, L"");
 				string str = "Load : " + String::ToString(wstr);
 				if (ImGui::Button(str.c_str()))
 				{
 					D3DDesc desc;
 					D3D::GetDesc(&desc);
-					function<void(wstring)> func = bind(&Landscape::Terrain::ChangeTexture, this, i, placeholders::_1);
+					function<void(wstring)> func = bind(&Landscape::Terrain::ChangeSubDiffuse, this, i, placeholders::_1);
 					Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("Delete"))
 				{
-					ChangeTexture(i, L"");
+					ChangeSubDiffuse(i, L"");
 				}
 			}
 		}
 	}
+
+	//subNormal
+	{
+		ImGui::Text("SubNormal");
+		for (UINT i = 0; i < TEXTURE_MAX; i++)
+		{
+			if (subNormal[i] == NULL)
+			{
+				string str = String::SInt("Load SubNormal%d", i + 1);
+				if (ImGui::Button(str.c_str()))
+				{
+					D3DDesc desc;
+					D3D::GetDesc(&desc);
+					function<void(wstring)> func = bind(&Landscape::Terrain::ChangeSubNormal, this, i, placeholders::_1);
+					Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
+				}
+			}
+			else
+			{
+				wstring wstr = subNormal[i]->GetFile();
+				String::Replace(&wstr, Contents, L"");
+				string str = "Load : " + String::ToString(wstr);
+				if (ImGui::Button(str.c_str()))
+				{
+					D3DDesc desc;
+					D3D::GetDesc(&desc);
+					function<void(wstring)> func = bind(&Landscape::Terrain::ChangeSubNormal, this, i, placeholders::_1);
+					Path::OpenFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Delete"))
+				{
+					ChangeSubNormal(i, L"");
+				}
+			}
+		}
+	}
+
+	ImGui::Separator();
+	//Total Texture
+	{
+		if (ImGui::Button("Create Total Diffuse"))
+		{
+			D3DDesc desc;
+			D3D::GetDesc(&desc);
+			function<void(wstring)> func = bind(&Landscape::Terrain::CreateTotalDiffuse, this, placeholders::_1);
+			Path::SaveFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
+		}
+		if (ImGui::Button("Create Total Normal"))
+		{
+			D3DDesc desc;
+			D3D::GetDesc(&desc);
+			function<void(wstring)> func = bind(&Landscape::Terrain::CreateTotalNormal, this, placeholders::_1);
+			Path::SaveFileDialog(L"", Path::ImageFilter, Landscapes, func, desc.Handle);
+		}
+	}
+
+
 }
 
 void Landscape::Terrain::PostRenderEnemyArea(void)
@@ -1034,79 +1131,22 @@ void Landscape::Terrain::DeleteTrees(D3DXVECTOR2 positionXZ, float radius)
 
 #endif
 
-void Landscape::Terrain::SaveJsonTerrain(wstring filename)
+void Landscape::Terrain::CreateTotalDiffuse(wstring filename)
 {
+	terrainData->CreateTotalDiffuse(filename, material->GetDiffuseMap(), subDiffuse);
 }
 
-void Landscape::Terrain::LoadJsonTerrain(wstring filename)
+void Landscape::Terrain::CreateTotalNormal(wstring filename)
 {
+	terrainData->CreateTotalNormal(filename, material->GetNormalMap(), subNormal);
 }
 
-void Landscape::Terrain::SaveXmlTerrain(wstring filename)
+void Landscape::Terrain::ChangeShader(wstring filename)
 {
-	Xml::XMLDocument* doc = new Xml::XMLDocument();
-	XmlElement* element = NULL;
-	string textValue;
-
-	//Material
-	{
-		vector<XmlElement*> FirstElements;
-		element = doc->NewElement("Material");
-		FirstElements.push_back(element);
-		{
-			XmlElement* parent = element;
-			vector<XmlElement*> SecondElements;
-
-			//Shader
-			element = doc->NewElement("Shader");
-			textValue = String::ToString(material->GetShader()->GetFile());
-			element->SetText(textValue.c_str());
-			SecondElements.push_back(element);
-
-			//DiffuseMap
-			element = doc->NewElement("DiffuseMap");
-			textValue = String::ToString(material->GetDiffuseMap()->GetFile());
-			element->SetText(textValue.c_str());
-			SecondElements.push_back(element);
-
-			//DetailMap
-			element = doc->NewElement("DetailMap");
-			textValue = String::ToString(material->GetDetailMap()->GetFile());
-			element->SetText(textValue.c_str());
-			SecondElements.push_back(element);
-
-
-			parent->InsertFirstChild(SecondElements[0]);
-			for (size_t i = 0; i < SecondElements.size() - 1; i++)
-				parent->InsertAfterChild(SecondElements[i], SecondElements[i + 1]);
-		}
-
-		element = doc->NewElement("HeightMap");
-		textValue = String::ToString(terrainData->GetHeightMapFile());
-		element->SetText(textValue.c_str());
-		FirstElements.push_back(element);
-
-		doc->InsertFirstChild(FirstElements[0]);
-		for (size_t i = 0; i < FirstElements.size() - 1; i++)
-			doc->InsertAfterChild(FirstElements[i], FirstElements[i + 1]);
-
-		//textures
-	}
-	
-	
-
-	string path = String::ToString(filename);
-	Xml::XMLError error = doc->SaveFile(path.c_str());
-	assert(error == Xml::XML_SUCCESS);
-
-	SAFE_DELETE(doc);
+	material->SetShader(filename);
 }
 
-void Landscape::Terrain::LoadXmlTerrain(wstring filename)
-{
-}
-
-void Landscape::Terrain::ChangeVertexData(VertexTypePTNC2* vertexData)
+void Landscape::Terrain::ChangeVertexData(TerrainVertexType* vertexData)
 {
 	assert(terrainData != NULL);
 
@@ -1120,15 +1160,33 @@ void Landscape::Terrain::ChangeDiffuseMap(wstring filename)
 	material->SetDiffuseMap(filename);
 }
 
-void Landscape::Terrain::ChangeTexture(UINT index, wstring filename)
+void Landscape::Terrain::ChangeNormalMap(wstring filename)
+{
+	assert(material != NULL);
+
+	material->SetNormalMap(filename);
+}
+
+void Landscape::Terrain::ChangeSubDiffuse(UINT index, wstring filename)
 {
 	assert(index < TEXTURE_MAX);
 
 	Texture* pTexture = filename.size() == 0 ? NULL : new Texture(filename);
 	
-	SAFE_DELETE(textures[index]);
+	SAFE_DELETE(subDiffuse[index]);
 
-	textures[index] = pTexture;
+	subDiffuse[index] = pTexture;
+}
+
+void Landscape::Terrain::ChangeSubNormal(UINT index, wstring filename)
+{
+	assert(index < TEXTURE_MAX);
+
+	Texture* pTexture = filename.size() == 0 ? NULL : new Texture(filename);
+
+	SAFE_DELETE(subNormal[index]);
+
+	subNormal[index] = pTexture;
 }
 
 #if USE_ASTAR

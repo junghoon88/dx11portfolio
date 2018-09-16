@@ -122,6 +122,7 @@ extern wstring  gWstringParentDirectory;
 #include "./Model/ModelBone.h"
 #include "./Model/ModelMesh.h"
 #include "./Model/Bounding/ModelShape.h"
+#include "./Model/Bounding/BoundingCollision.h"
 
 
 #include "./Lights/LightManager.h"
@@ -133,3 +134,4 @@ extern wstring  gWstringParentDirectory;
 
 typedef VertexTextureNormalTangentBlend ModelVertexType;
 typedef VertexTexture OceanVertexType;
+typedef VertexTypePTNC2 TerrainVertexType;

@@ -205,8 +205,8 @@ void Material::SetBuffer(void)
 	}
 	else
 	{
-		//Texture::SetBlankShaderResource(slot);
-		//Texture::SetBlankSamplerState(slot);
+		Texture::SetBlankShaderResource(slot);
+		Texture::SetBlankSamplerState(slot);
 	}
 
 
@@ -218,21 +218,21 @@ void Material::SetBuffer(void)
 	}
 	else
 	{
-		//Texture::SetBlankShaderResource(slot);
-		//Texture::SetBlankSamplerState(slot);
+		Texture::SetBlankShaderResource(slot);
+		Texture::SetBlankSamplerState(slot);
 	}
 
 
 	slot = 2;
 	if (emissiveMap != NULL)
 	{
-		//emissiveMap->SetShaderResource(slot);
-		//emissiveMap->SetShaderSampler(slot);
+		emissiveMap->SetShaderResource(slot);
+		emissiveMap->SetShaderSampler(slot);
 	}
 	else
 	{
-		//Texture::SetBlankShaderResource(slot);
-		//Texture::SetBlankSamplerState(slot);
+		Texture::SetBlankShaderResource(slot);
+		Texture::SetBlankSamplerState(slot);
 	}
 
 
@@ -244,8 +244,8 @@ void Material::SetBuffer(void)
 	}
 	else
 	{
-		//Texture::SetBlankShaderResource(slot);
-		//Texture::SetBlankSamplerState(slot);
+		Texture::SetBlankShaderResource(slot);
+		Texture::SetBlankSamplerState(slot);
 	}
 
 
@@ -257,8 +257,8 @@ void Material::SetBuffer(void)
 	}
 	else
 	{
-		//Texture::SetBlankShaderResource(slot);
-		//Texture::SetBlankSamplerState(slot);
+		Texture::SetBlankShaderResource(slot);
+		Texture::SetBlankSamplerState(slot);
 	}
 
 	buffer->SetPSBuffer(1);

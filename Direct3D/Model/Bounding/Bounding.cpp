@@ -85,3 +85,12 @@ void Bounding::PostRender(void)
 		break;
 	}
 }
+
+bool Bounding::FindAttackList(GameModel * model)
+{
+	auto iter = attackList.find(model);
+	if (iter == attackList.end())
+		return false;
+
+	return true;
+}

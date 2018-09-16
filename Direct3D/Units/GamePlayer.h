@@ -4,6 +4,7 @@
 struct GamePlayerSpec;
 struct GamePlayerInput;
 
+
 class GamePlayer : public GameUnit
 {
 public:
@@ -19,6 +20,10 @@ public:
 	void Update(void);
 	void Render(void);
 	void PostRender(void);
+
+	virtual void ActionHit(GameUnit* victim) override;		//공격 했을 때
+	virtual void ActionDamage(GameUnit* attacker) override;	//공격 당했을 때
+
 
 private:
 	void LinkAnimation(void);

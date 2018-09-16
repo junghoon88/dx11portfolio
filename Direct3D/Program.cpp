@@ -160,9 +160,9 @@ void Program::InitializeValues(void)
 
 void Program::InitializeExecutes(void)
 {
-	executes.push_back(new EditLevel(values));
+	//executes.push_back(new EditLevel(values));
 	//executes.push_back(new EditModel(values));
-	//executes.push_back(new DrawStage(values));
+	executes.push_back(new DrawStage(values));
 	executes.push_back(new ExeGui(values));
 }
 

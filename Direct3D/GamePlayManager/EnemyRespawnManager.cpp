@@ -14,7 +14,6 @@ EnemyRespawnManager::EnemyRespawnManager(DrawStage* stage)
 	, battleStart(false)
 	, battleEnd(false)
 {
-	areas = stage->GetTerrain()->GetEnemyAreasRef();
 }
 
 EnemyRespawnManager::~EnemyRespawnManager()
@@ -87,21 +86,30 @@ void EnemyRespawnManager::RespawnRobot(EnemyArea & area, UINT num)
 			if (Math::Random(0, 1) == 0)
 			{
 				//XBot
-				int num = Math::Random(1, XBOT_MAX);
+				gmodelFile = Models + L"Bot/XBot.gmodel";
 			}
 			else
 			{
 				//YBot
-
+				gmodelFile = Models + L"Bot/YBot.gmodel";
 			}
 		}
 
 
-
-
-
 		GModelReadWriter::OpenGModel(gmodelFile, GModelReadWriter::GModelReadClass::GameEnemyRobot, (void**)&robot);
+		robot->Init();
 		robot->LinkAddress(stage->GetPlayer());
+
+		D3DXVECTOR3 pos(0, 0, 0);
+		pos.x = Math::Random(area.Start.x, area.Start.x + area.Size.x);
+		pos.z = Math::Random(area.Start.y, area.Start.y + area.Size.y);
+		robot->SetPosition(pos);
+
 		stage->AddEnemy(robot);
 	}
+}
+
+void EnemyRespawnManager::AddArea(EnemyArea area)
+{
+	areas.push_back(area);
 }

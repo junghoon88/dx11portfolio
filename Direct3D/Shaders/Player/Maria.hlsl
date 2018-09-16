@@ -52,7 +52,7 @@ PixelInput VS(VertexTextureNormalTangentBlend input)
     output.vPosition = GetView(output.wPosition);
     output.pPosition = GetProjection(output.vPosition);
 
-    output.normal = mul(input.normal, (float3x3)transform);
+    output.normal = normalize(mul(input.normal, (float3x3) transform));
 
     output.uv = input.uv;
 
@@ -74,25 +74,19 @@ float4 PS(PixelInput input) : SV_TARGET
         float4 diffuseMap = _diffuseMap.Sample(_diffuseSampler, input.uv);
     
         float4 normalMap = _normalMap.Sample(_normalSampler, input.uv);
-        float3 bump = TangentSpace(normalMap.rgb, input.normal, input.tangent);
+        //float3 bump = TangentSpace(normalMap.rgb, input.normal, input.tangent);
+        //bump = normalize(bump);
+        float3 bump = BumpNormal(normalMap.rgb, input.normal, input.tangent);
     
-        float3 color1 = 0;
-        float3 color2 = 0;
-        Diffuse(color1, input.normal);
-        Diffuse(color2, diffuseMap.rgb, bump);
-        //Diffuse(color2, diffuseMap.rgb, input.normal);
-        color.rgb += color1 * 2.0f + color2 * 6.0f;
-    }
-
+        Diffuse(color.rgb, diffuseMap.rgb, bump);
     
-    {
         float4 specularMap = _specularMap.Sample(_specularSampler, input.uv);
         //Specular(color.rgb, specularMap.rgb, input.normal, input.view);
         float3 sColor = 0;
         if (length(specularMap) > 0)
-            Specular(sColor, input.normal, input.view);
+            Specular(sColor, bump, input.view);
         
-        color.rgb += sColor * 1.0f;
+        color.rgb += sColor * 0.8f;
     }
 
     //light

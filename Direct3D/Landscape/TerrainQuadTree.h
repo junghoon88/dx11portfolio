@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Model/Bounding/BoundingBox.h"
+#include "../Model/Bounding/BoundingFrustum.h"
+#include "../Model/Bounding/Ray.h"
 
 #define ALPHAMAP_MAX	2
 
@@ -10,11 +12,15 @@ struct QuadTree
 	int				Level;
 	UINT			WidthOffset;
 	UINT			HeightOffset;
+
+	UINT			VertexCount;
+	ID3D11Buffer*	VertexBuffer;
+	TerrainVertexType* VertexData;
+
 	UINT			IndexCount;
 	ID3D11Buffer*	IndexBuffer;
 	UINT*			IndexData;
 	BoundingBox*	box;
-
 	QuadTree*		Next[4];
 
 	QuadTree(int level, UINT widthOffset, UINT heightOffset)
@@ -22,6 +28,11 @@ struct QuadTree
 		Level = level;
 		WidthOffset = widthOffset;
 		HeightOffset = heightOffset;
+
+		VertexCount = 0;
+		VertexBuffer = NULL;
+		VertexData = NULL;
+
 		IndexCount = 0;
 		IndexBuffer = NULL;
 		IndexData = NULL;
@@ -35,45 +46,124 @@ struct QuadTree
 	~QuadTree()
 	{
 		SAFE_DELETE(box);
+
+		SAFE_RELEASE(VertexBuffer);
+		SAFE_DELETE_ARRAY(VertexData);
+
 		SAFE_RELEASE(IndexBuffer);
 		SAFE_DELETE_ARRAY(IndexData);
+
 		for (size_t i = 0; i < 4; i++)
 			SAFE_DELETE(Next[i]);
 	}
-	void Render(FrustumCulling* frustumCulling, VertexTypePTNC2* vertexData)
+
+	void Render(BoundingFrustum* frustum)
 	{
-		bool bNext = false;
-		for (int i = 0; i < 4; i++)
+		bool bContain = false;
+		ContainmentType type = frustum->Contains(box);
+		if (type == ContainmentType::Contains
+			|| type == ContainmentType::Intersects)
 		{
-			if (Next[i] != NULL)
-			{
-				bNext = true;
-				Next[i]->Render(frustumCulling, vertexData);
-			}
+			bContain = true;
 		}
 
-		if (bNext == false)
+		//if (bContain)
 		{
-			//bool bContain = false;
-			//for (UINT i = 0; i < IndexCount; i++)
-			//{
-			//	if (frustumCulling->ContainPoint(vertexData[IndexData[i]].position))
-			//	{
-			//		bContain = true;
-			//		break;
-			//	}
-			//}
-			//
-			//if (bContain)
+			bool bNext = false;
+			for (int i = 0; i < 4; i++)
 			{
+				if (Next[i] != NULL)
+				{
+					bNext = true;
+					Next[i]->Render(frustum);
+				}
+			}
+
+			if (bNext == false)
+			{
+				UINT stride = sizeof(TerrainVertexType);
+				UINT offset = 0;
+				gDC->IASetVertexBuffers(0, 1, &VertexBuffer, &stride, &offset);
 				gDC->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 				gDC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 				gDC->DrawIndexed(IndexCount, 0, 0);
 			}
 		}
+	}
 
-		box->Update();
+	bool MousePickked(D3DXVECTOR3& start, D3DXVECTOR3& direction, OUT D3DXVECTOR2& position)
+	{
+		float u, v, distance;
+
+
+		if (Next[0] != NULL)
+		{
+			//하위 트리가 있을 때에는 큰 사각형으로 우선체크한다.
+			D3DXVECTOR3 pos[6];
+			D3DXVECTOR3 min = box->GetOrgMin();
+			D3DXVECTOR3 max = box->GetOrgMax();
+			pos[0] = D3DXVECTOR3(min.x, 0.0f, min.z);
+			pos[1] = D3DXVECTOR3(max.x, 0.0f, min.z);
+			pos[2] = D3DXVECTOR3(min.x, 0.0f, max.z);
+			pos[3] = D3DXVECTOR3(max.x, 0.0f, min.z);
+			pos[4] = D3DXVECTOR3(min.x, 0.0f, max.z);
+			pos[5] = D3DXVECTOR3(max.x, 0.0f, max.z);
+
+			for (size_t i = 0; i < 6; i+=3)
+			{
+				if (D3DXIntersectTri(&pos[i], &pos[i+1], &pos[i+2],
+									 &start, &direction, &u, &v, &distance) == TRUE)
+				{
+					bool bRes = false;
+					for (size_t j = 0; j < 4; j++)
+					{
+						bRes |= Next[j]->MousePickked(start, direction, position);
+					}
+
+					if (bRes == false)
+					{
+						printf("");
+					}
+
+					return bRes;
+				}
+			}
+		}
+		else
+		{
+			map<float, D3DXVECTOR2> picks;
+
+			for (UINT i = 0; i < IndexCount; i += 3)
+			{
+				float u, v, distance;
+				if (D3DXIntersectTri(&VertexData[IndexData[i]].position,
+									 &VertexData[IndexData[i + 1]].position,
+									 &VertexData[IndexData[i + 2]].position,
+									 &start, &direction, &u, &v, &distance) == TRUE)
+				{
+					float minx = VertexData[IndexData[i]].position.x;
+					float minz = VertexData[IndexData[i]].position.z;
+
+					minx = Math::Min(minx, VertexData[IndexData[i + 1]].position.x);
+					minz = Math::Min(minz, VertexData[IndexData[i + 1]].position.z);
+					minx = Math::Min(minx, VertexData[IndexData[i + 2]].position.x);
+					minz = Math::Min(minz, VertexData[IndexData[i + 2]].position.z);
+
+					picks[distance] = D3DXVECTOR2(minx, minz);
+				}
+			}
+
+			if (picks.size() > 0)
+			{
+				position = (*picks.begin()).second;
+
+				picks.clear();
+
+				return true;
+			}
+
+			return false;
+		}
 	}
 };
 
@@ -88,7 +178,7 @@ namespace Landscape
 		void SetHeightMapFile(wstring file, float heightRatio = 10.0f);
 		void SetAlphaMapFile(UINT index, wstring file);
 
-		void Render(FrustumCulling* frustumCulling);
+		void Render(class ExecuteValues* values);
 
 		float GetHeight(D3DXVECTOR3 position);
 		bool MousePickked(D3DXVECTOR3 start, D3DXVECTOR3 direction, OUT D3DXVECTOR2& position);
@@ -117,11 +207,9 @@ namespace Landscape
 	private:
 		void Clear(void);
 
-		void FillVertexData(float heightRatio);
 		void FillNormalData(void);
 
-		void CreateBuffer(void);
-		void CreateTree(QuadTree* tree);
+		void CreateTree(QuadTree* tree, vector<D3DXCOLOR>& pixels);
 
 
 		void UpdateVertexData(bool calcNormalData = true, D3D11_BOX* box = NULL);
@@ -140,11 +228,8 @@ namespace Landscape
 		float heightRatio;
 
 		UINT width, height;
-		UINT vertexCount;
-		ID3D11Buffer* vertexBuffer;
 
 		QuadTree* root;
 
-		VertexTypePTNC2* vertexData;
 	};
 }

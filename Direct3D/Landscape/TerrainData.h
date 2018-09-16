@@ -48,6 +48,7 @@ namespace Landscape
 
 		void SaveHeightMap(wstring filename);
 		void SaveAlphaMap(UINT index, wstring filename);
+		void SaveTexture(wstring filename, UINT* colors, UINT count, UINT imgWidth, UINT imgHeight);
 
 		void ClearVertexHeight(void);
 		void ClearVertexAlpha(void);
@@ -57,6 +58,10 @@ namespace Landscape
 		void SetAttribute(SellAttribute attribute, D3DXVECTOR2 gridStart, D3DXVECTOR2 gridSize);
 		void SetAttribute(SellAttribute attribute, D3DXVECTOR2 grid);
 		void SetIsLanded(bool isLanded, D3DXVECTOR2 grid);
+
+		void CreateTotalDiffuse(wstring filename, Texture* diffuse, Texture** subDiffuse);
+		void CreateTotalNormal(wstring filename, Texture* normal, Texture** subNormal);
+		void GetAlphaValue(UINT x, UINT z, UINT imgWidth, UINT imgHeight, OUT D3DXCOLOR& alpha1, OUT D3DXCOLOR& alpha2);
 
 	private:
 		void Clear(void);
@@ -71,6 +76,7 @@ namespace Landscape
 		void UpdateAstarSell(void);
 
 	public:
+		inline Texture* GetHeightMap(void) { return heightMap; }
 		inline wstring GetHeightMapFile(void) { return heightMapFile; }
 		inline wstring GetAlphaMapFile(UINT index) { assert(index < ALPHAMAP_MAX); return alphaMapFile[index]; }
 		inline Sell* GetAstarSells(void) { return AstarSells; }

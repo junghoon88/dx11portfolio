@@ -133,6 +133,8 @@ void GameModel::Update(void)
 			boundings[i]->Update();
 		}
 	}
+
+	gBoundingCollision->AddBoundings(boundings);
 }
 
 void GameModel::Render(void)

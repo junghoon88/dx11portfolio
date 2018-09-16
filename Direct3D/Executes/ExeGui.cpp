@@ -23,8 +23,6 @@ void ExeGui::Update(void)
 
 		if (gKeyboard->IsDown(VK_F2))
 			ChangeShowEditorSettingWindow();
-		//if (gKeyboard->IsDown(VK_F2))
-		//	ChangeShowLandscapeWindow();
 
 		if (gKeyboard->IsDown(VK_F3))
 			ChangeShowGlobalLightWindow();
@@ -151,6 +149,7 @@ void ExeGui::PostRender(void)
 			//	values->editableFlag ^= (ULONG)ExcuteFlags::Terrain;
 			//}
 			ImGui::Checkbox("EditableTerrain", &values->GuiSettings->bShowLandscapeWindow);
+			//ImGui::Checkbox("EditableOcean", &values->GuiSettings->bShowOceanWindow);
 		}
 
 		ImGui::Text("RenderFlag");
@@ -165,6 +164,12 @@ void ExeGui::PostRender(void)
 			if (ImGui::Checkbox("RenderTerrain", &bRenderTerrain))
 			{
 				values->renderFlag ^= (ULONG)ExcuteFlags::Terrain;
+			}
+
+			bool bRenderOcean = (values->renderFlag & (ULONG)ExcuteFlags::Ocean) == (ULONG)ExcuteFlags::Ocean;
+			if (ImGui::Checkbox("RenderOcean", &bRenderOcean))
+			{
+				values->renderFlag ^= (ULONG)ExcuteFlags::Ocean;
 			}
 		}
 		ImGui::End();

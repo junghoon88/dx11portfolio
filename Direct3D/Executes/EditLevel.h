@@ -4,8 +4,9 @@ class GameModel;
 class BoundingSphere;
 class BoundingBox;
 
-#include "../Landscape/Terrain.h"
-#include "../Environment/Sky.h"
+namespace Landscape { class Terrain; class Ocean; }
+namespace Environment { class Sky; }
+
 
 class EditLevel : public Execute
 {
@@ -37,6 +38,7 @@ private:
 
 	Landscape::Terrain* terrain;
 	Environment::Sky* sky;
+	Landscape::Ocean* ocean;
 
 	vector<GameModel*> staticModels;
 	

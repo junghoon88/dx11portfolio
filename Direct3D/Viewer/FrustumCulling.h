@@ -2,6 +2,7 @@
 
 class Camera;
 class Perspective;
+class BoundingBox;
 
 class FrustumCulling
 {
@@ -13,6 +14,7 @@ public:
 
 	bool ContainPoint(float x, float y, float z);
 	bool ContainPoint(D3DXVECTOR3 position);
+	bool ContainPoint(BoundingBox* box);
 
 public:
 	inline void SetZFar(float value) { zFar = value; }

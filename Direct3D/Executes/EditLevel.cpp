@@ -3,8 +3,12 @@
 
 #include "../Fbx/Exporter.h"
 
-#include "../Model/Bounding/BoundingSphere.h"
+#include "../Landscape/Terrain.h"
+#include "../Landscape/Ocean.h"
+#include "../Environment/Sky.h"
 
+#include "../Model/Bounding/BoundingSphere.h"
+#include "../Landscape/TerrainData.h"
 
 EditLevel::EditLevel(ExecuteValues* values)
 	: Execute(values)
@@ -13,11 +17,14 @@ EditLevel::EditLevel(ExecuteValues* values)
 {
 	terrain = new Landscape::Terrain(values);
 	sky = new Environment::Sky(values);
+	ocean = new Landscape::Ocean(values, 64, 64, 4, 0, 0);
 
 	playerStart = new BoundingSphere(NULL);
 	playerStart->SetShow(true);
 
 	LoadJsonFile();
+
+	ocean->SetHeightMap(terrain->GetTerrainData()->GetHeightMap());
 }
 
 EditLevel::~EditLevel()
@@ -26,6 +33,7 @@ EditLevel::~EditLevel()
 
 	SAFE_DELETE(terrain);
 	SAFE_DELETE(sky);
+	SAFE_DELETE(ocean);
 
 	SAFE_DELETE(playerStart);
 
@@ -40,6 +48,7 @@ void EditLevel::Update(void)
 {
 	sky->Update();
 	terrain->Update();
+	ocean->Update();
 
 	playerStart->Update();
 
@@ -58,12 +67,14 @@ void EditLevel::Render(void)
 {
 	sky->Render();
 	terrain->Render();
+	ocean->Render();
 }
 
 void EditLevel::PostRender(void)
 {
 	sky->PostRender();
 	terrain->PostRender();
+	ocean->PostRender();
 
 	EditPlayerStart();
 }
@@ -80,6 +91,7 @@ void EditLevel::LoadJsonFile(void)
 
 		sky->LoadData(levelJson);
 		terrain->LoadData(levelJson);
+		ocean->LoadData(levelJson);
 		gLight->LoadData(levelJson);
 		this->LoadData();
 	}
@@ -93,6 +105,7 @@ void EditLevel::SaveJsonFile(void)
 	sky->SaveData(levelJson);
 	terrain->SaveData(levelJson);
 	gLight->SaveData(levelJson);
+	ocean->SaveData(levelJson);
 	this->SaveData();
 	
 

@@ -58,10 +58,11 @@ void EditModel::PreRender(void)
 void EditModel::Render(void)
 {
 	grid->Render();
-	if (model)
+
+	if (model
+		&& (values->renderFlag & (ULONG)ExcuteFlags::Model))
 	{
 		model->Render();
-
 	}
 }
 

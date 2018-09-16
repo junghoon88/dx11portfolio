@@ -265,7 +265,6 @@ void DistanceFog(inout float3 color, float dist)
 
 
 ////////////////////////////////
-
 void Diffuse(inout float3 color, float3 normal)
 {
     float intensity = saturate(dot(normal, -_direction));
@@ -278,7 +277,9 @@ void Diffuse(inout float3 color, float3 diffuse, float3 normal)
     float3 light = -_direction;
     float intensity = saturate(dot(normal, light));
 
-    color += diffuse * intensity;
+    float3 orgColor = _ambient.rgb + _diffuse.rgb * intensity;
+
+    color += diffuse * orgColor;
 }
 
 void Diffuse(inout float3 color, float3 diffuse, float3 normal, float factor)

@@ -17,6 +17,15 @@ GamePlayer::GamePlayer(wstring path, ANIMATION_TYPE animType)
 	specData = new GamePlayerSpec();
 	input = new GamePlayerInput();
 
+	unitInfo.Level	= 1;
+	unitInfo.HP		= specData->HP1Lv + specData->HPpLv * unitInfo.Level;
+	unitInfo.HPMax	= specData->HP1Lv + specData->HPpLv * unitInfo.Level;
+	unitInfo.MP		= specData->MP1Lv + specData->MPpLv * unitInfo.Level;
+	unitInfo.MPMax	= specData->MP1Lv + specData->MPpLv * unitInfo.Level;
+	unitInfo.Exp	= 0.0f;
+	unitInfo.ExpMax = specData->Exp1Lv + specData->ExppLv * unitInfo.Level;
+	unitInfo.Atk	= specData->Atk1Lv + specData->AtkpLv * unitInfo.Level;
+	unitInfo.Dep	= specData->Dep1Lv + specData->DeppLv * unitInfo.Level;
 }
 
 GamePlayer::~GamePlayer()
@@ -34,6 +43,8 @@ void GamePlayer::Init(void)
 
 void GamePlayer::Update(void)
 {
+	if (valid == false)	return;
+
 	HandleInput();
 	
 	//if (bOverwriteAction == true)
@@ -47,12 +58,21 @@ void GamePlayer::Update(void)
 
 	if (GameModel::isPlayEnd)
 	{
-		SetPlayerIdle();
+		if (isLive)
+		{
+			SetPlayerIdle();
+		}
+		else
+		{
+			valid = false;
+		}
 	}
 }
 
 void GamePlayer::Render(void)
 {
+	if (valid == false)	return;
+
 	GameUnit::Render();
 }
 
@@ -82,6 +102,27 @@ void GamePlayer::PostRender(void)
 		}
 	}
 	ImGui::End();
+}
+
+void GamePlayer::ActionHit(GameUnit * attacker)
+{
+}
+
+void GamePlayer::ActionDamage(GameUnit * attacker)
+{
+	GameUnit::ActionDamage(attacker);
+
+	if (isLive == false)
+	{
+		PlayAction(PlayerAction::Death1);
+	}
+	else
+	{
+		if (curAction == PlayerAction::Idle)
+		{
+			//PlayAction(PlayerAction::Damage);
+		}
+	}
 }
 
 void GamePlayer::LinkAnimation(void)
@@ -121,6 +162,12 @@ void GamePlayer::LinkAnimation(void)
 
 void GamePlayer::HandleInput(void)
 {
+	if (isLive == false)
+	{
+		GameModel::velocity = D3DXVECTOR3(0, 0, 0);
+		return;
+	}
+
 	HandleMove();
 	HandleRotation();
 	HandleAttack();
@@ -267,6 +314,11 @@ void GamePlayer::PlayAction(PlayerAction action, float startTime)
 					bounding->SetShow(false);
 					bounding->SetEnable(false);
 				}
+				else if (bounding->GetBoundingProp() == BoundingProp::Armor)
+				{
+					bounding->SetShow(true);
+					bounding->SetEnable(true);
+				}
 			}
 			blendTime = 0.5f;
 		}
@@ -285,7 +337,7 @@ void GamePlayer::PlayAction(PlayerAction action, float startTime)
 		case PlayerAction::Charge_Attack: 
 		case PlayerAction::High_Spin_Attack:
 			{
-				Bounding* sword = GameModel::GetBounding("Sword");
+				Bounding* sword = GameModel::GetBounding("MariaSword");
 				if (sword != NULL)
 				{
 					sword->SetShow(true);
@@ -296,7 +348,7 @@ void GamePlayer::PlayAction(PlayerAction action, float startTime)
 			break;
 		case PlayerAction::Kick:
 		{
-			Bounding* kick = GameModel::GetBounding("Kick");
+			Bounding* kick = GameModel::GetBounding("MariaKick");
 			if (kick != NULL)
 			{
 				kick->SetShow(true);

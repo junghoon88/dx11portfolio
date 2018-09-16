@@ -142,18 +142,12 @@ void BoundingCapsule::GetCenters(D3DXVECTOR3 & c1, D3DXVECTOR3 & c2)
 
 float BoundingCapsule::GetRadius(void)
 {
-	D3DXMATRIX mat;
-	mymodel->GetWorld(mat);
-	
-	return radius * mat._11;// * mymodel->GetTransformRef().Scale.x;
+	return radius * myWorld._11;
 }
 
 float BoundingCapsule::GetHeight(void)
 {
-	D3DXMATRIX mat;
-	mymodel->GetWorld(mat);
-
-	return height * mat._22;// * mymodel->GetTransformRef().Scale.y;
+	return height * myWorld._22;
 }
 
 bool BoundingCapsule::isCollision(BoundingCapsule * capsule1, BoundingCapsule * capsule2)

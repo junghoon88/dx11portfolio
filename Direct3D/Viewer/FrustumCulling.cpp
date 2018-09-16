@@ -2,6 +2,7 @@
 #include "FrustumCulling.h"
 #include "Camera.h"
 #include "Perspective.h"
+#include "../Model/Bounding/BoundingBox.h"
 
 FrustumCulling::FrustumCulling(float zFar, Camera* camera, Perspective* perspective)
 	: zFar(zFar), camera(camera), perspective(perspective)
@@ -98,4 +99,9 @@ bool FrustumCulling::ContainPoint(D3DXVECTOR3 position)
 	}
 
 	return true;
+}
+
+bool FrustumCulling::ContainPoint(BoundingBox * box)
+{
+	return false;
 }

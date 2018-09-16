@@ -31,10 +31,10 @@ struct GamePlayerSpec : public GameDataSpec
 
 struct GameEnemySpec : public GameDataSpec
 {
-	float MoveSpeed = 4.0f;
-	float FollowRange = 20.0f;
-	float AttackRange = 5.0f;
-	float AttackDelay = 2.0f;
+	float MoveSpeed = 10.0f;
+	float FollowRange = 200.0f;
+	float AttackRange = 10.0f;
+	float AttackDelay = 5.0f;
 };
 
 struct GameEnemyRobotSpec : public GameEnemySpec
@@ -42,5 +42,10 @@ struct GameEnemyRobotSpec : public GameEnemySpec
 	//float MoveSpeed = 4.0f;
 	//float FollowRange = 20.0f;
 	//float AttackRange = 5.0f;
+
+	float HP = 30;
+	float Atk = 10;
+	float Dep = 3;
+
 };
 

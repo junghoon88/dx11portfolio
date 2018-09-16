@@ -70,16 +70,18 @@ namespace Landscape
 		//void DeleteTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ);
 		//void DeleteTrees(D3DXVECTOR2 positionXZ, float radius);
 
-		void SaveJsonTerrain(wstring filename);
-		void LoadJsonTerrain(wstring filename);
-		void SaveXmlTerrain(wstring filename);
-		void LoadXmlTerrain(wstring filename);
+		void CreateTotalDiffuse(wstring filename);
+		void CreateTotalNormal(wstring filename);
 
 	public:
-		void ChangeVertexData(VertexTypePTNC2* vertexData);
+		void ChangeShader(wstring filename);
+
+		void ChangeVertexData(TerrainVertexType* vertexData);
 
 		void ChangeDiffuseMap(wstring filename);
-		void ChangeTexture(UINT index, wstring filename);
+		void ChangeNormalMap(wstring filename);
+		void ChangeSubDiffuse(UINT index, wstring filename);
+		void ChangeSubNormal(UINT index, wstring filename);
 		D3DXVECTOR2 GetHoveringGrid(void);
 
 
@@ -89,11 +91,13 @@ namespace Landscape
 		//inline AStar* GetAStar(void) { return astar; }
 		inline vector<EnemyArea>& GetEnemyAreasRef(void) { return enemyAreas; }
 
+		inline TerrainData* GetTerrainData(void) { return terrainData; }
+
 	private:
 		ExecuteValues*		values;
 
-		//TerrainData*		terrainData;
-		TerrainQuadTree*		terrainData;
+		TerrainData*		terrainData;
+		//TerrainQuadTree*		terrainData;
 
 		Material*			material;
 		WorldBuffer*		worldBuffer;
@@ -111,11 +115,12 @@ namespace Landscape
 		//terrain 정보 백업용
 		D3DXVECTOR2				clickedGrid;
 		bool					bChangeTerrain;
-		VertexTypePTNC2*		vertexDataOld;
+		TerrainVertexType*		vertexDataOld;
 
 		//alpha 맵 텍스쳐
 		UINT					selectTexture;
-		Texture*				textures[TEXTURE_MAX];
+		Texture*				subDiffuse[TEXTURE_MAX];
+		Texture*				subNormal[TEXTURE_MAX];
 
 		//Tree
 		//vector<Landscape::Tree*> trees;

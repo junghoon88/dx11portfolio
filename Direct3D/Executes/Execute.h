@@ -13,9 +13,11 @@ enum class ExcuteFlags
 	//ExcuteDrawTerrain
 	Terrain		= 0x0002,
 	Tree		= 0x0004,
+	Ocean		= 0x0008,
+	Sky			= 0x0010,
 
 
-	All			= Model | Terrain | Tree
+	All			= Model | Terrain | Tree | Ocean | Sky
 };
 
 
@@ -49,7 +51,7 @@ struct ExecuteValues
 		editableFlag = 0;
 		renderFlag = 0;
 	}
-
+	
 	void GetMainCameraFrustum(BoundingFrustum* CameraFrustum)
 	{
 		D3DDesc desc;

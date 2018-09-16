@@ -111,6 +111,7 @@ WPARAM Window::Run(void)
 	program = new Program();
 
 	ModelShape::Create();
+	BoundingCollision::Create();
 
 	while (true)
 	{
@@ -124,7 +125,7 @@ WPARAM Window::Run(void)
 		}
 		else
 		{
-			gTime->Update(60);
+			gTime->Update(1000);
 
 			if (ImGui::IsMouseHoveringAnyWindow() == FALSE
 				&& ImGui::IsAnyItemActive() == FALSE)
@@ -157,6 +158,7 @@ WPARAM Window::Run(void)
 	CommandManager::Delete();
 	LightManager::Delete();
 	ModelShape::Delete();
+	BoundingCollision::Delete();
 
 	return msg.wParam;
 }
