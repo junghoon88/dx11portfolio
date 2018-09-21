@@ -2,8 +2,9 @@
 #include "Terrain.h"
 #include "TerrainData.h"
 #include "TerrainQuadTree.h"
-//#include "Tree.h"
+#include "Tree.h"
 //#include "AStar.h"
+#include "../Model/Component.h"
 
 #include "../Command/CommandTerrain.h"
 
@@ -495,9 +496,9 @@ void Landscape::Terrain::UpdateMouse(void)
 					}
 				}
 				break;
+#if USE_TREE
 				case EDITMODE_MAKETREE:
 				{
-#if USE_TREE
 					if (gMouse->IsDown(MOUSE_LBUTTON))
 					{
 						if (gKeyboard->IsPress(VK_SHIFT))
@@ -509,9 +510,9 @@ void Landscape::Terrain::UpdateMouse(void)
 							AddTrees(gridBuffer->Data.Position, gridBuffer->Data.Radius, intensity);
 						}
 					}
-#endif
 				}
 				break;
+#endif
 			}
 		}
 		break;
@@ -524,7 +525,9 @@ void Landscape::Terrain::UpdateMouse(void)
 				case EDITMODE_ALPHATEXTURE:
 				case EDITMODE_HEIGHTUPDOWN:
 				case EDITMODE_HEIGHTSMOOTH:
+#if USE_TREE
 				case EDITMODE_MAKETREE:
+#endif
 				case EDITMODE_ENEMYAREA:
 				{
 					//Grid Select
@@ -699,9 +702,9 @@ void Landscape::Terrain::UpdateKeyboard(void)
 				break;
 				case EDITMODE_HEIGHTSMOOTH:
 					break;
+#if USE_TREE
 				case EDITMODE_MAKETREE:
 				{
-#if USE_TREE
 					if (gKeyboard->IsDown(VK_RETURN))
 					{
 						AddTrees(gridBuffer->Data.SelectGridStart, gridBuffer->Data.SelectGridSize, intensity);
@@ -710,8 +713,8 @@ void Landscape::Terrain::UpdateKeyboard(void)
 					{
 						DeleteTrees(gridBuffer->Data.SelectGridStart, gridBuffer->Data.SelectGridSize);
 					}
-#endif
 				}
+#endif
 				break;
 				case EDITMODE_ENEMYAREA:
 				{
@@ -754,7 +757,9 @@ void Landscape::Terrain::PostRenderEditMenu(void)
 		case EDITMODE_ALPHATEXTURE:	ImGui::Text("EDITMODE_ALPHATEXTURE");	break;
 		case EDITMODE_HEIGHTUPDOWN:	ImGui::Text("EDITMODE_HEIGHTUPDOWN");	break;
 		case EDITMODE_HEIGHTSMOOTH:	ImGui::Text("EDITMODE_HEIGHTSMOOTH");	break;
+#if USE_TREE
 		case EDITMODE_MAKETREE:		ImGui::Text("EDITMODE_MAKETREE");		break;
+#endif
 		case EDITMODE_ENEMYAREA:	ImGui::Text("EDITMODE_ENEMYAREA");		break;
 		case EDITMODE_ASTARTEST:	ImGui::Text("EDITMODE_ASTARTEST");		break;
 	}
@@ -1058,8 +1063,8 @@ void Landscape::Terrain::AddTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ, int i
 		position.y = GetVertexHeight(position) + (scale.y * 0.5f);
 
 		Tree* tree = new Tree(values);
-		tree->SetTransformPosition(position);
-		tree->SetTransformScale(scale);
+		tree->GetTransform()->Position = position;
+		tree->GetTransform()->Scale = scale;
 		tree->SetFiexedY(true);
 
 		//bool bFixedY = false;
@@ -1087,8 +1092,8 @@ void Landscape::Terrain::AddTrees(D3DXVECTOR2 positionXZ, float radius, int inte
 		position.y = GetVertexHeight(position) + (scale.y * 0.5f);
 
 		Tree* tree = new Tree(values);
-		tree->SetTransformPosition(position);
-		tree->SetTransformScale(scale);
+		tree->GetTransform()->Position = position;
+		tree->GetTransform()->Scale = scale;
 		tree->SetFiexedY(true);
 
 		//bool bFixedY = false;
@@ -1103,7 +1108,7 @@ void Landscape::Terrain::DeleteTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ)
 {
 	for (UINT i = 0; i < trees.size();)
 	{
-		D3DXVECTOR3 pos = trees[i]->GetTransformPosition();
+		D3DXVECTOR3 pos = trees[i]->GetTransform()->Position;
 		if (pos.x >= startXZ.x && pos.x <= startXZ.x + sizeXZ.x
 			&& pos.z >= startXZ.y && pos.z <= startXZ.y + sizeXZ.y)
 		{
@@ -1118,7 +1123,7 @@ void Landscape::Terrain::DeleteTrees(D3DXVECTOR2 positionXZ, float radius)
 	float dist = 0.0f;
 	for (UINT i = 0; i < trees.size();)
 	{
-		D3DXVECTOR3 pos = trees[i]->GetTransformPosition();
+		D3DXVECTOR3 pos = trees[i]->GetTransform()->Position;
 		dist = sqrt(pow(pos.x - positionXZ.x, 2) + pow(pos.z - positionXZ.y, 2));
 
 		if (dist < radius)

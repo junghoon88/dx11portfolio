@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Model { class BinModel; }
+class MeshQuad;
 
 namespace Landscape
 {
@@ -35,33 +35,19 @@ namespace Landscape
 
 
 	public:
-		//TRANSFROM
-		inline void SetTransform(TRANSFORM tr)				{ transform = tr; }
-		inline void SetTransformScale(D3DXVECTOR3 vec)		{ transform.Scale = vec; }
-		inline void SetTransformRotateDeg(D3DXVECTOR3 vec)	{ transform.RotationDeg = vec; }
-		inline void SetTransformPosition(D3DXVECTOR3 vec)	{ transform.Position = vec; }
-		inline void SetTransformTranslate(D3DXVECTOR3 vec)	{ transform.Position += vec; }
-		inline TRANSFORM GetTransform(void)					{ return transform; }
-		inline D3DXVECTOR3 GetTransformScale(void)			{ return transform.Scale; }
-		inline D3DXVECTOR3 GetTransformRotateDeg(void)		{ return transform.RotationDeg; }
-		inline D3DXVECTOR3 GetTransformPosition(void)		{ return transform.Position; }
-		inline D3DXVECTOR3& GetTransformScaleRef(void)		{ return transform.Scale; }
-		inline D3DXVECTOR3& GetTransformRotateDegRef(void)	{ return transform.RotationDeg; }
-		inline D3DXVECTOR3& GetTransformPositionRef(void)	{ return transform.Position; }
-
 		inline void SetFiexedY(bool val) { bFixedY = val; }
-
+		inline TRANSFORM* GetTransform(void) { return &transform; }
 
 	private:
 		ExecuteValues*		values;
 
-		Model::BinModel*	model;
+		MeshQuad*			quad[4];
 		WorldBuffer*		worldBuffer;
 
 		Buffer*				buffer;
 
 		TRANSFORM			transform;
 
-		bool bFixedY;
+		bool				bFixedY;
 	};
 }

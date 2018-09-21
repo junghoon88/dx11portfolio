@@ -25,7 +25,7 @@ namespace Landscape
 		EDITMODE_ALPHATEXTURE,
 		EDITMODE_HEIGHTUPDOWN,
 		EDITMODE_HEIGHTSMOOTH,
-		EDITMODE_MAKETREE,
+		//EDITMODE_MAKETREE,
 		EDITMODE_ENEMYAREA,
 		EDITMODE_ASTARTEST,
 
@@ -65,10 +65,10 @@ namespace Landscape
 		void PostRenderTextures(void);
 		void PostRenderEnemyArea(void);
 
-		//void AddTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ, int intensity);
-		//void AddTrees(D3DXVECTOR2 positionXZ, float radius, int intensity);
-		//void DeleteTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ);
-		//void DeleteTrees(D3DXVECTOR2 positionXZ, float radius);
+		void AddTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ, int intensity);
+		void AddTrees(D3DXVECTOR2 positionXZ, float radius, int intensity);
+		void DeleteTrees(D3DXVECTOR2 startXZ, D3DXVECTOR2 sizeXZ);
+		void DeleteTrees(D3DXVECTOR2 positionXZ, float radius);
 
 		void CreateTotalDiffuse(wstring filename);
 		void CreateTotalNormal(wstring filename);
@@ -123,7 +123,7 @@ namespace Landscape
 		Texture*				subNormal[TEXTURE_MAX];
 
 		//Tree
-		//vector<Landscape::Tree*> trees;
+		vector<Landscape::Tree*> trees;
 
 		//Astar test
 		//AStar* astar;

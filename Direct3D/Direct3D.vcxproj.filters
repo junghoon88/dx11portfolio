@@ -229,6 +229,12 @@
     <ClCompile Include="Units\UnitHpBar.cpp">
       <Filter>Units</Filter>
     </ClCompile>
+    <ClCompile Include="Landscape\Tree.cpp">
+      <Filter>Landscape</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\MeshQuad.cpp">
+      <Filter>Objects\Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -511,6 +517,12 @@
     </ClInclude>
     <ClInclude Include="Units\UnitHpBar.h">
       <Filter>Units</Filter>
+    </ClInclude>
+    <ClInclude Include="Landscape\Tree.h">
+      <Filter>Landscape</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\MeshQuad.h">
+      <Filter>Objects\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

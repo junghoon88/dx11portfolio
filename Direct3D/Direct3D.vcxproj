@@ -104,6 +104,7 @@
     <ClCompile Include="Landscape\Terrain.cpp" />
     <ClCompile Include="Landscape\TerrainData.cpp" />
     <ClCompile Include="Landscape\TerrainQuadTree.cpp" />
+    <ClCompile Include="Landscape\Tree.cpp" />
     <ClCompile Include="Lights\Fog.cpp" />
     <ClCompile Include="Lights\LightManager.cpp" />
     <ClCompile Include="Lights\PointLight.cpp" />
@@ -130,6 +131,7 @@
     <ClCompile Include="Objects\GModelReadWrite.cpp" />
     <ClCompile Include="Objects\MeshCapsule.cpp" />
     <ClCompile Include="Objects\MeshCube.cpp" />
+    <ClCompile Include="Objects\MeshQuad.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="Renders\Material.cpp" />
     <ClCompile Include="Renders\RenderTarget.cpp" />
@@ -195,6 +197,7 @@
     <ClInclude Include="Landscape\Terrain.h" />
     <ClInclude Include="Landscape\TerrainData.h" />
     <ClInclude Include="Landscape\TerrainQuadTree.h" />
+    <ClInclude Include="Landscape\Tree.h" />
     <ClInclude Include="Lights\Fog.h" />
     <ClInclude Include="Lights\LightManager.h" />
     <ClInclude Include="Lights\PointLight.h" />
@@ -224,6 +227,7 @@
     <ClInclude Include="Objects\GModelReadWrite.h" />
     <ClInclude Include="Objects\MeshCapsule.h" />
     <ClInclude Include="Objects\MeshCube.h" />
+    <ClInclude Include="Objects\MeshQuad.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="Renders\GlobalBuffers.h" />
     <ClInclude Include="Renders\Material.h" />

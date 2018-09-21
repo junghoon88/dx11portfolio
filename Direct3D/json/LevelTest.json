@@ -1,43 +1,43 @@
 {
    "Environment" : {
       "Sky" : {
-         "Ceiling Color Day" : [ 0.13432334363460541, 0.16748017072677612, 0.42156863212585449, 1.0 ],
-         "Ceiling Color Night" : [ 0.36634945869445801, 0.36637222766876221, 0.7549019455909729, 1.0 ],
-         "Ceiling Color Twilight" : [ 0.17978663742542267, 0.25965461134910583, 0.63235294818878174, 1.0 ],
-         "Horizon Color Day" : [ 0.48529410362243652, 0.36159166693687439, 0.36159166693687439, 1.0 ],
-         "Horizon Color Night" : [ 0.15686273574829102, 0.059207998216152191, 0.059207998216152191, 1.0 ],
-         "Horizon Color Twilight" : [ 0.70588231086730957, 0.34463629126548767, 0.10380623489618301, 1.5 ],
-         "Horizon Height" : 0.20200000703334808
+         "Ceiling Color Day" : [ 0.26340833306312561, 0.34830504655838013, 0.9950980544090271, 1.0 ],
+         "Ceiling Color Night" : [ 0.063581332564353943, 0.064103908836841583, 0.72058820724487305, 1.0 ],
+         "Ceiling Color Twilight" : [ 0.23241059482097626, 0.35277730226516724, 0.91176468133926392, 1.0 ],
+         "Horizon Color Day" : [ 0.30392158031463623, 0.23092080652713776, 0.23092080652713776, 1.0 ],
+         "Horizon Color Night" : [ 0.098039209842681885, 0.035082660615444183, 0.035082660615444183, 1.0 ],
+         "Horizon Color Twilight" : [ 0.82352942228317261, 0.44808778166770935, 0.19780851900577545, 1.5 ],
+         "Horizon Height" : 0.15800000727176666
       },
       "SkyPlane" : {
-         "brightness" : 0.52000004053115845,
-         "scale" : 0.64000004529953003,
+         "brightness" : 0.48000001907348633,
+         "scale" : 0.20000000298023224,
          "skyPlaneBottom" : 0.0,
-         "skyPlaneResolution" : 15,
-         "skyPlaneTop" : 0.72000002861022949,
-         "skyPlaneWidth" : 7.4000005722045898,
-         "textureRepeat" : 3
+         "skyPlaneResolution" : 11,
+         "skyPlaneTop" : 0.81000006198883057,
+         "skyPlaneWidth" : 12.40000057220459,
+         "textureRepeat" : 4
       }
    },
    "Landscape" : {
       "Ocean" : {
          "BumpHeight" : 0.5,
-         "BumpSpeed" : [ 0.0, -0.10000000149011612 ],
+         "BumpSpeed" : [ 0.0, -0.0099999997764825821 ],
          "DeepColor" : [ 0.20000000298023224, 0.5, 0.94999998807907104, 1.0 ],
          "FresnelAmount" : 0.5,
-         "FresnelBias" : 0.80000001192092896,
+         "FresnelBias" : 0.5,
          "FresnelPower" : 0.5,
-         "Height" : 60,
+         "Height" : 64,
          "HeightRatio" : 7.5,
-         "ShallowColor" : [ 0.69999998807907104, 0.85000002384185791, 0.80000001192092896, 1.0 ],
+         "ShallowColor" : [ 0.43137255311012268, 0.86274510622024536, 0.71895420551300049, 1.0 ],
          "ShoreBlend" : 35.0,
          "SpecularAmount" : 0.5,
-         "TextureScale" : [ 2.0, 3.0 ],
+         "TextureScale" : [ 1.0, 1.0 ],
          "Thick" : 2,
-         "WaveAmplitude" : 1.0,
+         "WaveAmplitude" : 2.0,
          "WaveFrequency" : 0.05000000074505806,
-         "Width" : 54,
-         "XOffset" : 133,
+         "Width" : 64,
+         "XOffset" : 128,
          "YOffset" : 0
       },
       "Terrain" : {
@@ -46,23 +46,15 @@
          "Brush Color Hover" : [ 1.0, 0.0, 0.0, 1.0 ],
          "Brush Color Selected" : [ 0.32802289724349976, 0.32806345820426941, 0.91666668653488159, 1.0 ],
          "Detail Map" : [ "../_Contents/Landscape/Dirt3_detail.png" ],
-         "Diffuse Map" : [ "../_Contents/Landscape/terrain/desert_sand_d.jpg" ],
+         "Diffuse Map" : [ "../_Contents/Landscape/terrain/desert_mntn_d.jpg" ],
          "EnemyArea" : {
-            "EnemyArea0-Color" : [ 0.92647057771682739, 0.20891004800796509, 0.20891004800796509, 1.0 ],
-            "EnemyArea0-Name" : [ "Phase1" ],
-            "EnemyArea0-Size" : [ 25.0, 45.0 ],
-            "EnemyArea0-Start" : [ 15.0, 25.0 ],
-            "EnemyArea1-Color" : [ 0.076557114720344543, 0.86764705181121826, 0.4956461489200592, 1.0 ],
-            "EnemyArea1-Name" : [ "Phase2" ],
-            "EnemyArea1-Size" : [ 25.0, 20.0 ],
-            "EnemyArea1-Start" : [ 10.0, 5.0 ],
-            "EnemyAreaCount" : 2
+            "EnemyAreaCount" : 0
          },
-         "Grid Color" : [ 0.030036540701985359, 0.61274510622024536, 0.11572892218828201, 1.0 ],
-         "Grid Spacing" : 10,
-         "Grid Thickness" : 0.029999999329447746,
+         "Grid Color" : [ 0.99998998641967773, 1.0, 0.99999171495437622, 1.0 ],
+         "Grid Spacing" : 5,
+         "Grid Thickness" : 0.12900000810623169,
          "Height Map" : [ "../_Contents/Landscape/HeightMap2.png" ],
-         "Normal Map" : [ "../_Contents/Landscape/terrain/desert_sand_n.jpg" ],
+         "Normal Map" : [ "../_Contents/Landscape/terrain/desert_mntn_n.jpg" ],
          "Shader File" : [ "../Direct3D/Shaders/Terrain.hlsl" ],
          "SubDiffuse0" : [ "../_Contents/Landscape/terrain/ground_mud_d.jpg" ],
          "SubDiffuse1" : [ "../_Contents/Landscape/terrain/grass_mix_d.jpg" ],
@@ -72,10 +64,10 @@
          "SubDiffuse5" : [ "../_Contents/Landscape/terrain/ground_cracks2v_d.jpg" ],
          "SubNormal0" : [ "../_Contents/Landscape/terrain/ground_mud_n.jpg" ],
          "SubNormal1" : [ "../_Contents/Landscape/terrain/grass_mix_n.jpg" ],
-         "SubNormal2" : [ "" ],
+         "SubNormal2" : [ "../_Contents/Landscape/terrain/ground_cracked_n.jpg" ],
          "SubNormal3" : [ "../_Contents/Landscape/terrain/jungle_stone_n.jpg" ],
-         "SubNormal4" : [ "" ],
-         "SubNormal5" : [ "" ]
+         "SubNormal4" : [ "../_Contents/Landscape/terrain/snow_grass_n.jpg" ],
+         "SubNormal5" : [ "../_Contents/Landscape/terrain/ground_cracks2_n.jpg" ]
       }
    },
    "Lights" : {

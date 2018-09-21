@@ -1,4 +1,5 @@
 #include "__CommonHeader.hlsl"
+#include "_LightHeader.hlsl"
 
 cbuffer VS_Bone : register(b2)
 {
@@ -85,14 +86,10 @@ float4 PS(PixelInput input) : SV_TARGET
     color = diffuse * intensity;
 
     float4 specular = _specularMap.Sample(_specularSampler, input.uv);
-    Specular(color.rgb, specular.rgb, _direction, input.normal, input.view);
+    Specular(color.rgb, specular.rgb, input.normal, input.view);
 
-    int i = 0;
-    for (i = 0; i < _pointLightCount; i++)
-        PointLighting(color.rgb, _pointLights[i], input.wPosition, input.normal);
-
-    for (i = 0; i < _spotLightCount; i++)
-        SpotLighting(color.rgb, _spotLights[i], input.wPosition, input.normal);
+    PointLightingAll(color.rgb, input.wPosition, input.normal);
+    SpotLightingAll(color.rgb, input.wPosition, input.normal);
 
     return color;
 }
